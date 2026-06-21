@@ -23,14 +23,32 @@
 
 | 工具 | 用途 | 保留理由 | 恢复边界 |
 |---|---|---|---|
-| VS Code | 编辑器和轻量 IDE | AI 编程和常规开发的基础入口 | 扩展、设置、登录状态可同步或手工恢复 |
+| VS Code | 编辑器和轻量 IDE | Windows 侧 UI 入口，配合 WSL 做主开发环境 | 扩展、设置、登录状态可同步或手工恢复 |
 | Codex | AI 编程工具 | 当前主力 agentic coding 工具之一 | 登录、API、模型和项目权限按设备处理 |
 | Claude | AI 编程工具 | 当前主力 agentic coding 工具之一 | 登录、权限、项目上下文和本地配置手工处理 |
 | GitHub CLI | GitHub 命令行 | 仓库、PR、issue 和认证操作方便 | `gh auth` 登录状态不入库 |
-| WSL | Linux 子系统 | Windows 上开发、代理、容器和 CLI 环境基础 | 发行版、home 目录、密钥和 Linux 配置另行恢复 |
-| Docker Desktop | 容器环境 | 本地开发、测试和服务依赖启动方便 | WSL 集成、镜像、volume 和许可状态按设备处理 |
-| Python Install Manager | Python 版本入口 | 避免仓库锁定某个 CPython 小版本 | 项目虚拟环境和包缓存不进入本仓库 |
-| Node.js LTS | Node.js 运行时 | 前端、脚本、AI 工具链常见依赖 | 全局 npm/pnpm 包应另行记录或由项目管理 |
+| WSL | Linux 子系统 | 主开发、运维、CLI 和 Docker 执行环境 | 发行版、home 目录、密钥和 Linux 配置另行恢复 |
+| Python Install Manager | Windows 原生 Python 入口 | 只服务少量 Windows 脚本或工具需求 | 主项目 Python 优先放 WSL，Windows 包缓存不入库 |
+
+## WSL 主力工具链
+
+WSL 不是 Windows winget profile，但它是主开发执行环境。相关清单见 `../../wsl/packages/`，初始化脚本见 `../../wsl/bootstrap.sh`。
+
+| 工具 | 用途 | 保留理由 | 恢复边界 |
+|---|---|---|---|
+| Docker Engine | 容器运行时 | Docker 放 WSL，避免 Windows 和 Linux 两边维护两套主运行时 | registry 登录、镜像、volume 和 Compose 数据不入库 |
+| Node.js LTS | Node.js 运行时 | 前端、脚本和 AI 工具链优先在 WSL 执行 | 全局包和缓存按 WSL 环境恢复 |
+| Python | Python 运行时 | 主项目 Python 优先在 WSL 内管理 | 虚拟环境、包缓存和项目数据不入库 |
+| mise | 多语言运行时和任务管理 | 统一管理 WSL 内 Node、Python、CLI 和项目任务 | 全局配置可模板化，项目配置跟随项目仓库 |
+| uv | Python 包和项目工具 | 快速、现代的 Python 工具链 | 项目环境和缓存不入库 |
+| pnpm | Node 包管理 | 前端和工具链常用 | store 路径和项目依赖按项目管理 |
+| Graphviz | 图形渲染 | 文档生成、架构图和依赖图更适合跟随 Linux 工具链 | 字体和渲染参数按项目处理 |
+| kubectl | Kubernetes CLI | K8s/K3s 主力操作工具放 WSL 更贴近服务器环境 | kubeconfig 和集群凭据手工恢复 |
+| Helm | Kubernetes 包管理 | Chart 安装和升级优先在 WSL 执行 | repo 配置和 values 文件按项目处理 |
+| k9s | K8s 终端 UI | 集群资源观察和操作效率高 | 依赖 kubeconfig，主题和快捷键按设备处理 |
+| kubectx / kubens | context / namespace 切换 | 多集群、多 namespace 操作更顺手 | 依赖 kubeconfig，不单独保存凭据 |
+| stern | Pod 日志聚合 | 多 Pod 日志查看和排查方便 | 依赖集群权限，过滤规则按场景使用 |
+| ORAS | OCI artifact 工具 | 处理 OCI Registry、Chart、镜像外 artifact 方便 | registry 登录状态和凭据手工处理 |
 
 ## 日常和桌面
 
@@ -71,49 +89,47 @@
 |---|---|---|---|
 | DBeaver | 数据库客户端 | 覆盖 PostgreSQL、SQLite 等多数据库场景 | 连接配置、密码和驱动缓存不入库 |
 | DB Browser for SQLite | SQLite GUI | 轻量查看和编辑 SQLite 文件 | 无明显边界，数据库文件不归本仓库管理 |
-| mise | 多语言运行时和任务管理 | 适合管理项目级工具链和脚本任务 | 全局配置可模板化，项目配置跟随项目仓库 |
 | SourceGit | Git GUI | 轻量 Git 图形客户端，补充 CLI 和 VS Code | 账号、密钥和本地仓库路径按设备处理 |
 | Bruno | API 调试 | local-first、Git 友好，适合接口集合和 AI 协作 | 环境变量、token 和真实地址需脱敏 |
 | DevToys | 开发小工具 | JSON、编码、哈希、时间戳等高频处理 | 无明显边界 |
 | WinMerge | 文件和目录对比 | Windows 上成熟的 diff/merge 工具 | 外部工具集成按设备配置 |
-| Graphviz | 图形渲染 | 架构图、依赖图、文档生成常用 | 字体和渲染参数按项目处理 |
 | draw.io | 图形绘制 | 架构图、流程图、本地绘图常用 | 文件存储跟随项目或知识库 |
 
 ### `k8s-toolkit`
 
 | 工具 | 用途 | 保留理由 | 恢复边界 |
 |---|---|---|---|
-| kubectl | Kubernetes CLI | K8s/K3s 集群操作基础工具 | kubeconfig 和集群凭据手工恢复 |
-| Helm | Kubernetes 包管理 | 安装和维护 Chart 必备 | repo 配置和 values 文件按项目处理 |
-| k9s | K8s 终端 UI | 观察和管理集群资源效率高 | kubeconfig、快捷键和主题按设备处理 |
-| kubectx | kube context 切换 | 多集群切换更方便 | 依赖 kubeconfig，不单独保存凭据 |
-| kubens | namespace 切换 | 频繁切换 namespace 时提高效率 | 依赖 kubeconfig，不单独保存凭据 |
-| stern | Pod 日志聚合 | 多 Pod 日志查看和排查方便 | 依赖集群权限，过滤规则按场景使用 |
-| ORAS | OCI artifact 工具 | 处理 OCI Registry、Chart、镜像外 artifact 方便 | registry 登录状态和凭据手工处理 |
+| kubectl | Kubernetes CLI | Windows 侧备用 K8s/K3s 操作工具 | 主力 kubeconfig 放 WSL，Windows 凭据手工处理 |
+| Helm | Kubernetes 包管理 | Windows 侧备用 Chart 操作工具 | repo 配置和 values 文件按项目处理 |
+| k9s | K8s 终端 UI | Windows 侧备用集群资源观察工具 | kubeconfig、快捷键和主题按设备处理 |
+| kubectx | kube context 切换 | Windows 侧备用 context 切换工具 | 依赖 kubeconfig，不单独保存凭据 |
+| kubens | namespace 切换 | Windows 侧备用 namespace 切换工具 | 依赖 kubeconfig，不单独保存凭据 |
+| stern | Pod 日志聚合 | Windows 侧备用日志查看工具 | 依赖集群权限，过滤规则按场景使用 |
+| ORAS | OCI artifact 工具 | Windows 侧备用 OCI artifact 工具 | registry 登录状态和凭据手工处理 |
 
 ### `scoop-cli`
 
 | 工具 | 用途 | 保留理由 | 恢复边界 |
 |---|---|---|---|
-| ripgrep | 文本搜索 | 快速搜索代码和日志 | 无明显边界 |
-| fd | 文件查找 | 比传统 find 更易用 | 无明显边界 |
-| fzf | 模糊选择 | 终端交互效率工具 | Shell 集成按设备配置 |
-| jq | JSON 处理 | API、日志和脚本常用 | 无明显边界 |
-| yq | YAML 处理 | K8s、配置文件和脚本常用 | 无明显边界 |
-| bat | 文件查看 | 带语法高亮的 cat 替代 | 主题按设备处理 |
-| delta | Git diff 增强 | 提升 diff 阅读体验 | Git 集成按设备处理 |
-| lazygit | Git TUI | 快速查看和操作 Git 仓库 | 账号和签名仍由 Git 配置决定 |
-| zoxide | 目录跳转 | 提升终端切目录效率 | 历史数据库按设备生成 |
-| starship | Shell prompt | 跨 shell 的提示符配置 | 字体和配置可模板化 |
-| uv | Python 包和项目工具 | 快速、现代的 Python 工具链 | 项目环境和缓存不入库 |
-| pnpm | Node 包管理 | 前端和工具链常用 | store 路径和项目依赖按项目管理 |
-| neovim | 终端编辑器 | 远程和轻量编辑补充 | 配置可独立维护，不建议塞入本仓库 |
-| just | 命令任务入口 | 项目常用命令标准化 | justfile 跟随项目仓库 |
-| hyperfine | Benchmark | 脚本和命令性能对比 | 无明显边界 |
-| tokei | 代码统计 | 代码量和语言统计 | 无明显边界 |
-| bottom | 系统监控 TUI | 终端查看 CPU、内存、进程 | 无明显边界 |
-| duf | 磁盘使用查看 | 比传统 df 更友好 | 无明显边界 |
-| dust | 目录空间分析 | 快速定位空间占用 | 无明显边界 |
+| ripgrep | 文本搜索 | Windows 侧备用搜索工具，主力放 WSL | 无明显边界 |
+| fd | 文件查找 | Windows 侧备用查找工具，主力放 WSL | 无明显边界 |
+| fzf | 模糊选择 | Windows 侧备用终端交互工具，主力放 WSL | Shell 集成按设备配置 |
+| jq | JSON 处理 | Windows 侧备用 JSON 处理工具，主力放 WSL | 无明显边界 |
+| yq | YAML 处理 | Windows 侧备用 YAML 处理工具，主力放 WSL | 无明显边界 |
+| bat | 文件查看 | Windows 侧备用文件查看工具，主力放 WSL | 主题按设备处理 |
+| delta | Git diff 增强 | Windows 侧备用 diff 工具，主力放 WSL | Git 集成按设备处理 |
+| lazygit | Git TUI | Windows 侧备用 Git TUI，主力放 WSL | 账号和签名仍由 Git 配置决定 |
+| zoxide | 目录跳转 | Windows 侧备用目录跳转工具，主力放 WSL | 历史数据库按设备生成 |
+| starship | Shell prompt | Windows 侧备用提示符，主力放 WSL | 字体和配置可模板化 |
+| uv | Python 包和项目工具 | Windows 侧备用，主项目优先 WSL | 项目环境和缓存不入库 |
+| pnpm | Node 包管理 | Windows 侧备用，主项目优先 WSL | store 路径和项目依赖按项目管理 |
+| neovim | 终端编辑器 | Windows 侧备用，主力放 WSL | 配置可独立维护，不建议塞入本仓库 |
+| just | 命令任务入口 | Windows 侧备用任务工具，主力放 WSL | justfile 跟随项目仓库 |
+| hyperfine | Benchmark | Windows 侧备用，主力放 WSL | 无明显边界 |
+| tokei | 代码统计 | Windows 侧备用，主力放 WSL | 无明显边界 |
+| bottom | 系统监控 TUI | Windows 侧备用，主力放 WSL | 无明显边界 |
+| duf | 磁盘使用查看 | Windows 侧备用，主力放 WSL | 无明显边界 |
+| dust | 目录空间分析 | Windows 侧备用，主力放 WSL | 无明显边界 |
 
 ## 网络、备份和同步
 
@@ -134,8 +150,8 @@
 
 | 工具 | 用途 | 保留理由 | 恢复边界 |
 |---|---|---|---|
-| restic | 备份 CLI | 适合脚本化、加密和可验证恢复 | 仓库地址、密码和恢复密钥不入库 |
-| rclone | 远端同步 CLI | 连接对象存储、网盘、SFTP 等远端 | remote 配置和凭据手工恢复 |
+| restic | 备份 CLI | Windows 侧备份 CLI；WSL home 也可用 WSL 侧 restic | 仓库地址、密码和恢复密钥不入库 |
+| rclone | 远端同步 CLI | Windows 侧远端同步 CLI；主力脚本可放 WSL | remote 配置和凭据手工恢复 |
 
 ### `sync-storage`
 
@@ -203,7 +219,7 @@
 
 | 工具 | 用途 | 保留理由 | 恢复边界 |
 |---|---|---|---|
-| Ollama | 本地模型运行 | 本地 LLM 体验和测试方便 | 模型数据体积大，不进入 Git |
+| Ollama | 本地模型运行 | Windows 侧本地 LLM 体验和测试方便 | 模型数据体积大，不进入 Git |
 | Jan | 本地 AI 客户端 | 图形化本地模型和聊天体验 | 模型、会话和配置按设备处理 |
 | LM Studio | 本地 AI 客户端 | 本地模型下载、运行和测试方便 | 模型数据和缓存不进入 Git |
 
