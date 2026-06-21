@@ -7,7 +7,12 @@
         { "PackageIdentifier": "DBeaver.DBeaver.Community" },
         { "PackageIdentifier": "DBBrowserForSQLite.DBBrowserForSQLite" },
         { "PackageIdentifier": "jdx.mise" },
-        { "PackageIdentifier": "sourcegit-scm.SourceGit" }
+        { "PackageIdentifier": "sourcegit-scm.SourceGit" },
+        { "PackageIdentifier": "Bruno.Bruno" },
+        { "PackageIdentifier": "DevToys-app.DevToys" },
+        { "PackageIdentifier": "WinMerge.WinMerge" },
+        { "PackageIdentifier": "Graphviz.Graphviz" },
+        { "PackageIdentifier": "JGraph.Draw" }
       ],
       "SourceDetails": {
         "Argument": "https://cdn.winget.microsoft.com/cache",
