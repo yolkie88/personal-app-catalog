@@ -1,6 +1,6 @@
 # 应用目录
 
-本文件是当前个人应用目录的总览。`windows/manifests/` 是可自动恢复部分；手工、敏感和非包管理器来源见 `sources.md` 和 `manual-boundaries.md`。
+本文件是当前个人应用目录的总览。`windows/manifests/` 是可自动恢复部分；每个软件的用途、保留理由和恢复边界见 `apps.md`，手工、敏感和非包管理器来源见 `sources.md` 和 `manual-boundaries.md`。
 
 ## 默认层
 
