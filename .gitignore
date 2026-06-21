@@ -1,0 +1,18 @@
+# Generated exports and local machine snapshots
+windows/exports/
+windows/*.log
+values.yaml
+
+# Never commit secrets or machine-specific private data
+**/*.key
+**/*.pem
+**/*.pfx
+**/*.p12
+**/*token*
+**/*secret*
+**/*password*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini

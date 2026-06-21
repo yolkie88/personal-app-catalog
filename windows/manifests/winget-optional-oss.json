@@ -1,0 +1,43 @@
+{
+  "$schema": "https://aka.ms/winget-packages.schema.2.0.json",
+  "CreationDate": "2026-06-20T00:00:00.000-00:00",
+  "Sources": [
+    {
+      "Packages": [
+        { "PackageIdentifier": "KeePassXCTeam.KeePassXC" },
+        { "PackageIdentifier": "Ditto.Ditto" },
+        { "PackageIdentifier": "QL-Win.QuickLook" },
+        { "PackageIdentifier": "ShareX.ShareX" },
+        { "PackageIdentifier": "Flameshot.Flameshot" },
+        { "PackageIdentifier": "PDFArranger.PDFArranger" },
+        { "PackageIdentifier": "KDE.Okular" },
+        { "PackageIdentifier": "Syncthing.Syncthing" },
+        { "PackageIdentifier": "Rclone.Rclone" },
+        { "PackageIdentifier": "VSCodium.VSCodium" },
+        { "PackageIdentifier": "Bruno.Bruno" },
+        { "PackageIdentifier": "DevToys-app.DevToys" },
+        { "PackageIdentifier": "WinMerge.WinMerge" },
+        { "PackageIdentifier": "Meld.Meld" },
+        { "PackageIdentifier": "Graphviz.Graphviz" },
+        { "PackageIdentifier": "JGraph.Draw" },
+        { "PackageIdentifier": "IDRIX.VeraCrypt" },
+        { "PackageIdentifier": "Cryptomator.Cryptomator" },
+        { "PackageIdentifier": "WireGuard.WireGuard" },
+        { "PackageIdentifier": "WiresharkFoundation.Wireshark" },
+        { "PackageIdentifier": "Insecure.Nmap" },
+        { "PackageIdentifier": "DuongDieuPhap.ImageGlass" },
+        { "PackageIdentifier": "Meltytech.Shotcut" },
+        { "PackageIdentifier": "BlenderFoundation.Blender" },
+        { "PackageIdentifier": "FreeCAD.FreeCAD" }
+      ],
+      "SourceDetails": {
+        "Argument": "https://cdn.winget.microsoft.com/cache",
+        "Identifier": "Microsoft.Winget.Source_8wekyb3d8bbwe",
+        "Name": "winget",
+        "Type": "Microsoft.PreIndexed.Package"
+      }
+    }
+  ],
+  "WinGetVersion": "1.0.0"
+}
+

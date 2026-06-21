@@ -1,0 +1,28 @@
+# Install with:
+# .\windows\bootstrap.ps1 -WithScoop
+#
+# Keep this list CLI-focused. Prefer winget for GUI apps.
+
+ripgrep
+fd
+fzf
+jq
+yq
+bat
+delta
+lazygit
+zoxide
+starship
+uv
+pnpm
+neovim
+just
+hyperfine
+tokei
+bottom
+duf
+dust
+
+# Only enable this if scripts explicitly need GNU/coreutils behavior.
+# uutils-coreutils
+
