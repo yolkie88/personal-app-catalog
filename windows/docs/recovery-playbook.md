@@ -54,6 +54,8 @@ Set-ExecutionPolicy -Scope Process Bypass
 - VS Code / Codex / Claude 可用；
 - WSL / Docker Desktop 是否需要重启或额外初始化。
 
+AI 编程工具主线只保留 Codex 和 Claude；Copilot 不作为个人恢复目录的一部分。
+
 ## 5. 恢复账号和基础配置
 
 这些内容不进入 Git，只恢复边界：
@@ -70,12 +72,14 @@ Set-ExecutionPolicy -Scope Process Bypass
 常用组合示例：
 
 ```powershell
-.\windows\bootstrap.ps1 -Profile daily,network,automation -Report
-.\windows\bootstrap.ps1 -Profile dev-extra,desktop-enhance -Report
+.\windows\bootstrap.ps1 -Profile daily,daily-extra,desktop-enhance -Report
+.\windows\bootstrap.ps1 -Profile dev-extra,k8s-toolkit -Report
+.\windows\bootstrap.ps1 -Profile network,automation -Report
 .\windows\bootstrap.ps1 -Profile media,media-toolkit -Report
+.\windows\bootstrap.ps1 -Profile maintenance -Report
 ```
 
-不要在没有明确需求时安装 `backup`、`proxy-core`、`local-ai`、`communication` 等强账号、强设备或大体积 profile。
+不要在没有明确需求时安装 `backup`、`backup-cli`、`sync-storage`、`security-toolkit`、`creative`、`proxy-core`、`local-ai`、`communication` 等强账号、强设备、大体积或维护类 profile。
 
 ## 7. Scoop CLI 工具层
 
@@ -97,10 +101,12 @@ Scoop 只用于 CLI 和小型便携工具。首次启用前先预览：
 
 - Tailscale 登录和设备授权；
 - 代理订阅、节点、dashboard secret、TUN 服务化配置；
-- Kopia / 其他备份仓库连接；
+- Kopia / restic / rclone 等备份仓库连接；
+- Syncthing / Cryptomator 等数据目录；
 - 远控设备码和无人值守密码；
 - Typora 等商业软件授权；
 - Docker / WSL 中的数据卷、发行版、服务端组件；
+- Kubernetes / K3s kubeconfig 和集群凭据；
 - 本地模型数据和大体积缓存。
 
 这些内容可以写脱敏模板，但不要提交真实值。
