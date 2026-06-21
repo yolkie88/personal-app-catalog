@@ -1,16 +1,40 @@
-# Generated exports and local machine snapshots
+# Generated exports, reports, and local machine snapshots
 windows/exports/
+windows/reports/
 windows/*.log
 values.yaml
+
+# Local environment and temporary files
+.env
+.env.*
+*.local
+*.local.*
+*.bak
+*.tmp
 
 # Never commit secrets or machine-specific private data
 **/*.key
 **/*.pem
 **/*.pfx
 **/*.p12
+**/*.asc
+**/*.age
 **/*token*
 **/*secret*
 **/*password*
+**/*keyfile*
+**/*recovery-key*
+
+# Sensitive local runtime/config files. Keep example templates trackable.
+**/config.yaml
+**/config.yml
+!**/config.example.yaml
+!**/config.example.yml
+**/profiles.yaml
+**/providers/
+**/subscriptions*
+**/*subscription*
+**/*subscribe*
 
 # OS/editor noise
 .DS_Store
