@@ -1,0 +1,20 @@
+# WSL-first CLI toolchain.
+# These tools are preferably installed and used inside WSL rather than through Windows Scoop.
+
+mise
+uv
+pnpm
+nodejs-lts
+python
+neovim
+lazygit
+delta
+zoxide
+starship
+just
+hyperfine
+tokei
+bottom
+duf
+dust
+graphviz
