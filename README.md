@@ -21,21 +21,28 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\windows\bootstrap.ps1 -Report
 ```
 
-默认只安装 `core + agentic-dev`。
+默认只安装 `core + agentic-dev`。AI 编程工具主线只保留 Codex 和 Claude。
 
 常用显式 profile：
 
 ```powershell
 .\windows\bootstrap.ps1 -Profile daily -Report
+.\windows\bootstrap.ps1 -Profile daily-extra -Report
 .\windows\bootstrap.ps1 -Profile backup -Report
+.\windows\bootstrap.ps1 -Profile backup-cli -Report
 .\windows\bootstrap.ps1 -Profile network -Report
 .\windows\bootstrap.ps1 -Profile automation -Report
 .\windows\bootstrap.ps1 -Profile communication -Report
 .\windows\bootstrap.ps1 -Profile dev-extra -Report
+.\windows\bootstrap.ps1 -Profile k8s-toolkit -Report
+.\windows\bootstrap.ps1 -Profile maintenance -Report
 .\windows\bootstrap.ps1 -Profile desktop-enhance -Report
 .\windows\bootstrap.ps1 -Profile media -Report
 .\windows\bootstrap.ps1 -Profile media-toolkit -Report
 .\windows\bootstrap.ps1 -Profile gaming -Report
+.\windows\bootstrap.ps1 -Profile sync-storage -Report
+.\windows\bootstrap.ps1 -Profile security-toolkit -Report
+.\windows\bootstrap.ps1 -Profile creative -Report
 .\windows\bootstrap.ps1 -Profile local-ai -Report
 .\windows\bootstrap.ps1 -Profile proxy-core -Report
 .\windows\bootstrap.ps1 -WithScoop -Report
@@ -44,7 +51,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 组合安装前建议先预览：
 
 ```powershell
-.\windows\bootstrap.ps1 -Profile daily,network,automation -WithScoop -Plan -Report
+.\windows\bootstrap.ps1 -Profile daily,network,automation,dev-extra,k8s-toolkit -WithScoop -Plan -Report
 ```
 
 更新和快照：
@@ -68,9 +75,10 @@ Set-ExecutionPolicy -Scope Process Bypass
 ## 目录规则
 
 - 默认层保持小，只包含 `core` 和 `agentic-dev`。
+- AI 编程工具主线只保留 Codex 和 Claude，Copilot 不进入个人恢复目录。
 - Python 通过 Python Install Manager 恢复，不在本仓库锁定某个 CPython 小版本。
 - 播放器默认 PotPlayer。
-- `all` 不是完整个人环境，只是宽松集合；敏感或强设备角色 profile 必须显式安装。
+- `all` 不是完整个人环境，只是宽松集合；敏感、强设备角色、大体积或维护类 profile 必须显式安装。
 - 同一应用只保留一个主来源。
 - Store、GitHub Releases、官方安装器、语言包管理器、Docker/WSL 和便携应用可以进入目录，但要明确是否可自动恢复。
 - 订阅、节点、授权码、设备码、私钥、token、备份密钥和模型数据不进入 Git。
