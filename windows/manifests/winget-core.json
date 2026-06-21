@@ -11,7 +11,6 @@
         { "PackageIdentifier": "Git.Git" },
         { "PackageIdentifier": "Microsoft.PowerToys" },
         { "PackageIdentifier": "voidtools.Everything" },
-        { "PackageIdentifier": "Klocman.BulkCrapUninstaller" },
         { "PackageIdentifier": "Devolutions.UniGetUI" },
         { "PackageIdentifier": "LocalSend.LocalSend" },
         { "PackageIdentifier": "Bitwarden.Bitwarden" }
@@ -26,4 +25,3 @@
   ],
   "WinGetVersion": "1.0.0"
 }
-
