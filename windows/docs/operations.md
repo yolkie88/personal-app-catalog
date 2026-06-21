@@ -30,7 +30,7 @@
 组合 profile 也建议先预览：
 
 ```powershell
-.\windows\bootstrap.ps1 -Profile daily,network,automation -WithScoop -Plan -Report
+.\windows\bootstrap.ps1 -Profile daily,network,automation,dev-extra,k8s-toolkit -WithScoop -Plan -Report
 ```
 
 ## 安装
@@ -45,15 +45,22 @@
 
 ```powershell
 .\windows\bootstrap.ps1 -Profile daily -Report
+.\windows\bootstrap.ps1 -Profile daily-extra -Report
 .\windows\bootstrap.ps1 -Profile backup -Report
+.\windows\bootstrap.ps1 -Profile backup-cli -Report
 .\windows\bootstrap.ps1 -Profile network -Report
 .\windows\bootstrap.ps1 -Profile automation -Report
 .\windows\bootstrap.ps1 -Profile communication -Report
 .\windows\bootstrap.ps1 -Profile dev-extra -Report
+.\windows\bootstrap.ps1 -Profile k8s-toolkit -Report
+.\windows\bootstrap.ps1 -Profile maintenance -Report
 .\windows\bootstrap.ps1 -Profile desktop-enhance -Report
 .\windows\bootstrap.ps1 -Profile media -Report
 .\windows\bootstrap.ps1 -Profile media-toolkit -Report
 .\windows\bootstrap.ps1 -Profile gaming -Report
+.\windows\bootstrap.ps1 -Profile sync-storage -Report
+.\windows\bootstrap.ps1 -Profile security-toolkit -Report
+.\windows\bootstrap.ps1 -Profile creative -Report
 .\windows\bootstrap.ps1 -Profile local-ai -Report
 .\windows\bootstrap.ps1 -Profile proxy-core -Report
 ```
@@ -67,7 +74,7 @@ Scoop CLI：
 组合安装：
 
 ```powershell
-.\windows\bootstrap.ps1 -Profile daily,network,automation -WithScoop -Report
+.\windows\bootstrap.ps1 -Profile daily,network,automation,dev-extra,k8s-toolkit -WithScoop -Report
 ```
 
 ## 更新
