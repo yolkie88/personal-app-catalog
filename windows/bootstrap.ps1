@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet("default", "core", "agentic-dev", "daily", "media", "gaming", "optional-oss", "proxy-core", "backup", "network", "automation", "communication", "dev-extra", "desktop-enhance", "media-toolkit", "local-ai", "all")]
+    [ValidateSet("default", "core", "agentic-dev", "daily", "daily-extra", "media", "gaming", "optional-oss", "proxy-core", "backup", "backup-cli", "network", "automation", "communication", "dev-extra", "k8s-toolkit", "maintenance", "sync-storage", "security-toolkit", "desktop-enhance", "media-toolkit", "creative", "local-ai", "all")]
     [string[]] $Profile = @("default"),
 
     [switch] $WithScoop,
@@ -32,7 +32,6 @@ function Resolve-Profiles {
                 $resolved.Add("daily")
                 $resolved.Add("media")
                 $resolved.Add("gaming")
-                $resolved.Add("optional-oss")
             }
             default {
                 $resolved.Add($item)
