@@ -1,12 +1,12 @@
 # personal-app-catalog
 
-个人应用清单中心，附带 Windows 恢复脚本。
+个人应用清单中心，附带 Windows 和 WSL 恢复脚本。
 
-这个仓库维护的是“我长期认可、愿意跨设备恢复的应用目录”，不是某台电脑的软件盘点。能自动安装的内容放在 `windows/manifests/`，不能或不应该自动恢复的内容写入文档的手工边界。
+这个仓库维护的是“我长期认可、愿意跨设备恢复的应用目录”，不是某台电脑的软件盘点。能自动安装的 Windows 内容放在 `windows/manifests/`，WSL 开发环境放在 `wsl/`，不能或不应该自动恢复的内容写入文档的手工边界。
 
 ## 快速使用
 
-先做结构校验和安装预览：
+先做 Windows 侧结构校验和安装预览：
 
 ```powershell
 cd <repo-path>
@@ -21,9 +21,22 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\windows\bootstrap.ps1 -Report
 ```
 
-默认只安装 `core + agentic-dev`。AI 编程工具主线只保留 Codex 和 Claude。
+默认只安装 `core + agentic-dev`。AI 编程工具主线只保留 Codex 和 Claude。Docker、Node.js、Kubernetes CLI 和主力开发 CLI 优先放在 WSL。
 
-常用显式 profile：
+WSL 侧先预览，再初始化：
+
+```bash
+./wsl/bootstrap.sh --base --cli --k8s --plan
+./wsl/bootstrap.sh --base --cli --k8s
+```
+
+Docker Engine 安装到 WSL：
+
+```bash
+./wsl/bootstrap.sh --docker
+```
+
+常用显式 Windows profile：
 
 ```powershell
 .\windows\bootstrap.ps1 -Profile daily -Report
@@ -51,7 +64,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 组合安装前建议先预览：
 
 ```powershell
-.\windows\bootstrap.ps1 -Profile daily,network,automation,dev-extra,k8s-toolkit -WithScoop -Plan -Report
+.\windows\bootstrap.ps1 -Profile daily,network,automation,dev-extra -WithScoop -Plan -Report
 ```
 
 更新和快照：
@@ -66,18 +79,21 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 | 文档 | 用途 |
 |---|---|
-| `windows/docs/catalog.md` | 当前 profile 和应用目录 |
+| `windows/docs/catalog.md` | 当前 Windows profile 和应用目录 |
 | `windows/docs/apps.md` | 每个软件的用途、保留理由和恢复边界 |
 | `windows/docs/sources.md` | 来源优先级和非 winget 记录方式 |
 | `windows/docs/manual-boundaries.md` | 敏感、授权、硬件、代理、远控等手工边界 |
-| `windows/docs/operations.md` | 安装、更新、维护流程 |
+| `windows/docs/operations.md` | Windows 安装、更新、维护流程 |
 | `windows/docs/recovery-playbook.md` | 新设备恢复顺序和人工边界 |
+| `wsl/docs/wsl.md` | WSL-first 开发环境说明 |
+| `wsl/docs/wsl-boundaries.md` | WSL 敏感配置和数据边界 |
 
 ## 目录规则
 
 - 默认层保持小，只包含 `core` 和 `agentic-dev`。
 - AI 编程工具主线只保留 Codex 和 Claude，Copilot 不进入个人恢复目录。
-- Python 通过 Python Install Manager 恢复，不在本仓库锁定某个 CPython 小版本。
+- Windows 侧 `agentic-dev` 只保留入口工具；Docker、Node.js、K8s CLI 和主力 CLI 工具链优先放在 WSL。
+- Python Install Manager 只用于 Windows 原生 Python 需求，主项目 Python 优先放在 WSL。
 - 播放器默认 PotPlayer。
 - `all` 不是完整个人环境，只是宽松集合；敏感、强设备角色、大体积或维护类 profile 必须显式安装。
 - 同一应用只保留一个主来源。
