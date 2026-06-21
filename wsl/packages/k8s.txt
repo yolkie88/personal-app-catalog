@@ -1,0 +1,9 @@
+# Kubernetes / K3s tools that should be used primarily inside WSL.
+
+kubectl
+helm
+k9s
+kubectx
+kubens
+stern
+oras
