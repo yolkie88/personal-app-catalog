@@ -1,0 +1,26 @@
+# Base packages installed through apt in WSL.
+# Keep this list conservative and distribution-friendly.
+
+build-essential
+ca-certificates
+curl
+git
+gnupg
+lsb-release
+openssh-client
+pkg-config
+software-properties-common
+unzip
+zip
+rsync
+
+# Common CLI utilities available from Ubuntu/Debian repositories.
+jq
+yq
+ripgrep
+fd-find
+fzf
+bat
+direnv
+tmux
+shellcheck
