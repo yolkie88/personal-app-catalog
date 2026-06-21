@@ -67,6 +67,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 | 文档 | 用途 |
 |---|---|
 | `windows/docs/catalog.md` | 当前 profile 和应用目录 |
+| `windows/docs/apps.md` | 每个软件的用途、保留理由和恢复边界 |
 | `windows/docs/sources.md` | 来源优先级和非 winget 记录方式 |
 | `windows/docs/manual-boundaries.md` | 敏感、授权、硬件、代理、远控等手工边界 |
 | `windows/docs/operations.md` | 安装、更新、维护流程 |
