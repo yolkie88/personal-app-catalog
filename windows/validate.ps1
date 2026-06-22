@@ -132,16 +132,11 @@ function Get-ProfileTokensFromMarkdown {
 function Test-DocumentedProfiles {
     param([string[]] $BootstrapProfiles)
 
-    $ignored = @("windows", "manifests", "scoop-cli")
-    $tokens = @((Get-ProfileTokensFromMarkdown -Path $CatalogPath) + (Get-ProfileTokensFromMarkdown -Path $ReadmePath)) | Sort-Object -Unique
+    $documented = @((Get-ProfileTokensFromMarkdown -Path $CatalogPath) + (Get-ProfileTokensFromMarkdown -Path $ReadmePath)) | Sort-Object -Unique
 
-    foreach ($token in $tokens) {
-        if ($ignored -contains $token) {
-            continue
-        }
-
-        if ($BootstrapProfiles -notcontains $token) {
-            Add-Failure "Documented token '$token' is not a bootstrap profile."
+    foreach ($profile in $BootstrapProfiles) {
+        if ($documented -notcontains $profile) {
+            Add-Failure "Bootstrap profile '$profile' is not documented in catalog.md or README.md."
         }
     }
 }
