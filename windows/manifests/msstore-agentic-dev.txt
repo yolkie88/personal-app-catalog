@@ -1,0 +1,3 @@
+# Microsoft Store package IDs for agentic-dev.
+# Codex App
+9PLM9XGG6VKS
