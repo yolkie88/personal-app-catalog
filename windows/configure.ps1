@@ -173,11 +173,26 @@ function Get-TerminalSettingsPath {
     return $null
 }
 
+function Remove-MetadataKeys {
+    # Strip top-level template metadata (e.g. _comment) so it never gets written into
+    # the user's real config. Iterate a snapshot since we mutate the collection.
+    param($Object)
+
+    foreach ($property in @($Object.PSObject.Properties)) {
+        if ($property.Name.StartsWith("_")) {
+            $Object.PSObject.Properties.Remove($property.Name)
+        }
+    }
+}
+
 function Merge-Object {
     param($Base, $Overlay)
 
     foreach ($property in $Overlay.PSObject.Properties) {
         $name = $property.Name
+        if ($name.StartsWith("_")) {
+            continue
+        }
         $value = $property.Value
         $existing = $Base.PSObject.Properties[$name]
 
@@ -204,6 +219,7 @@ function Invoke-TerminalConfig {
 
     $defaultsPath = Join-Path $ConfigDir "terminal/settings.defaults.json"
     $overlay = Get-Content -Path $defaultsPath -Raw | ConvertFrom-Json
+    Remove-MetadataKeys -Object $overlay
 
     if ($Plan.IsPresent) {
         Write-Host "    [plan] merge $defaultsPath into $settingsPath"
@@ -308,6 +324,7 @@ function Invoke-VSCodeConfig {
 
     $defaultsPath = Join-Path $ConfigDir "vscode/settings.json"
     $overlay = Get-Content -Path $defaultsPath -Raw | ConvertFrom-Json
+    Remove-MetadataKeys -Object $overlay
 
     if ($Plan.IsPresent) {
         Write-Host "    [plan] merge $defaultsPath into $settingsPath"

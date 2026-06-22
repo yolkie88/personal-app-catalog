@@ -49,4 +49,5 @@
 - 模板不含身份、凭据、密钥或 token；`windows/validate.ps1` 会扫描 `windows/config/` 拦截 secret 赋值和 email。
 - Git 身份仍写在你自己的全局配置；本层只通过 `include.path` 叠加共享配置。
 - 配置层不是 winget profile，不进入 `bootstrap.ps1` 的 `ValidateSet`、`all` 集合或 `catalog.md` 的 profile 表。
+- JSON 模板（Windows Terminal、VS Code settings）里以 `_` 开头的 key 是模板元数据（如 `_comment`），`configure.ps1` 深合并前会剥掉，不会写进你的真实配置。
 - VS Code 配置层是可选的（`configure.ps1 -VSCode`）：只管理推荐扩展和脱敏 settings 默认值，深合并保留你已有的 key。**不管理**账号登录、Settings Sync 密钥、私有扩展源——这些仍走 VS Code 自带 Settings Sync 或手工恢复。
