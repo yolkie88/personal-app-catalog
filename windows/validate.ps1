@@ -284,6 +284,7 @@ function Test-WslFiles {
         "wsl/packages/k8s.txt",
         "wsl/packages/docker.txt",
         "wsl/docs/wsl.md",
+        "wsl/docs/tools.md",
         "wsl/docs/wsl-boundaries.md"
     )
 
