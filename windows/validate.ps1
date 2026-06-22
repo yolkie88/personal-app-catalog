@@ -10,6 +10,8 @@ $BootstrapPath = Join-Path $ScriptRootPath "bootstrap.ps1"
 $CatalogPath = Join-Path $ScriptRootPath "docs/catalog.md"
 $ReadmePath = Join-Path $RepoRoot "README.md"
 $GitignorePath = Join-Path $RepoRoot ".gitignore"
+$WslDir = Join-Path $RepoRoot "wsl"
+$WslPackagesDir = Join-Path $WslDir "packages"
 
 $Failures = New-Object System.Collections.Generic.List[string]
 
@@ -227,6 +229,108 @@ function Test-Gitignore {
     }
 }
 
+function Get-ActiveListItems {
+    param([string] $Path)
+
+    if (-not (Test-Path $Path)) {
+        return @()
+    }
+
+    Get-Content -Path $Path |
+        ForEach-Object { $_.Trim() } |
+        Where-Object { $_ -and -not $_.StartsWith("#") }
+}
+
+function Test-ListFile {
+    param(
+        [string] $Path,
+        [string] $Name,
+        [bool] $RequireMiseSelector = $false
+    )
+
+    if (-not (Test-Path $Path)) {
+        Add-Failure "Missing WSL list file: $Name"
+        return @()
+    }
+
+    $items = @(Get-ActiveListItems -Path $Path)
+    if ($items.Count -eq 0) {
+        Add-Failure "$Name has no active entries."
+        return @()
+    }
+
+    $seen = @{}
+    foreach ($item in $items) {
+        if ($seen.ContainsKey($item)) {
+            Add-Failure "Duplicate WSL entry '$item' in $Name."
+        } else {
+            $seen[$item] = $true
+        }
+
+        if ($RequireMiseSelector -and $item -notmatch '@') {
+            Add-Failure "$Name entry '$item' should include a mise selector such as @latest, @lts, or an exact version."
+        }
+    }
+
+    $items
+}
+
+function Test-WslFiles {
+    $required = @(
+        "wsl/bootstrap.sh",
+        "wsl/validate.sh",
+        "wsl/packages/apt-base.txt",
+        "wsl/packages/cli.txt",
+        "wsl/packages/k8s.txt",
+        "wsl/packages/docker.txt",
+        "wsl/docs/wsl.md",
+        "wsl/docs/wsl-boundaries.md"
+    )
+
+    foreach ($relative in $required) {
+        $path = Join-Path $RepoRoot $relative
+        if (-not (Test-Path $path)) {
+            Add-Failure "Missing WSL file: $relative"
+        }
+    }
+}
+
+function Test-WslPackageLists {
+    $aptBase = Test-ListFile -Path (Join-Path $WslPackagesDir "apt-base.txt") -Name "wsl/packages/apt-base.txt"
+    $cli = Test-ListFile -Path (Join-Path $WslPackagesDir "cli.txt") -Name "wsl/packages/cli.txt" -RequireMiseSelector $true
+    $k8s = Test-ListFile -Path (Join-Path $WslPackagesDir "k8s.txt") -Name "wsl/packages/k8s.txt" -RequireMiseSelector $true
+    $docker = Test-ListFile -Path (Join-Path $WslPackagesDir "docker.txt") -Name "wsl/packages/docker.txt"
+
+    $requiredDockerPackages = @("docker-ce", "docker-ce-cli", "containerd.io", "docker-buildx-plugin", "docker-compose-plugin")
+    foreach ($package in $requiredDockerPackages) {
+        if ($docker -notcontains $package) {
+            Add-Failure "wsl/packages/docker.txt missing required Docker package: $package"
+        }
+    }
+}
+
+function Test-WslFirstBoundaries {
+    $agenticManifest = Join-Path $ManifestDir "winget-agentic-dev.json"
+    if (-not (Test-Path $agenticManifest)) {
+        Add-Failure "Missing winget-agentic-dev.json."
+        return
+    }
+
+    $agenticContent = Get-Content -Path $agenticManifest -Raw
+    foreach ($forbidden in @("Docker.DockerDesktop", "OpenJS.NodeJS.LTS")) {
+        if ($agenticContent -match [regex]::Escape($forbidden)) {
+            Add-Failure "$forbidden should not be in agentic-dev; it is WSL-first in this catalog."
+        }
+    }
+
+    foreach ($file in Get-ChildItem -Path $ManifestDir -Filter "winget-*.json") {
+        $content = Get-Content -Path $file.FullName -Raw
+        if ($content -match [regex]::Escape("Docker.DockerDesktop")) {
+            Add-Failure "Docker.DockerDesktop should not be in Windows winget manifests; Docker Engine is installed through WSL. Found in $($file.Name)."
+        }
+    }
+}
+
 $bootstrapProfiles = @(Get-BootstrapProfiles)
 $manifestProfiles = @(Get-ManifestProfiles)
 
@@ -236,9 +340,11 @@ Test-DocumentedProfiles -BootstrapProfiles $bootstrapProfiles
 Test-AllProfileSet
 Test-ScoopList
 Test-Gitignore
+Test-WslFiles
+Test-WslPackageLists
+Test-WslFirstBoundaries
 
 if ($Failures.Count -gt 0) {
-    Write-Host "Validation failed:"
     foreach ($failure in $Failures) {
         Write-Host "- $failure"
     }
