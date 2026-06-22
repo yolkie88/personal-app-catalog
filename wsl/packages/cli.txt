@@ -1,17 +1,17 @@
-# WSL-first CLI toolchain.
-# These tools are preferably installed and used inside WSL rather than through Windows Scoop.
+# WSL-first CLI toolchain. mise installs and pins these versions; bootstrap.sh
+# reads this file directly, so it is the single source of truth. mise itself is
+# bootstrapped separately and is not listed here.
 
-mise
-uv
-pnpm
-nodejs-lts
-python
-neovim
-lazygit
-delta
-zoxide
-starship
-just
+node@lts
+python@latest
+uv@latest
+pnpm@latest
+neovim@latest
+lazygit@latest
+delta@latest
+zoxide@latest
+starship@latest
+just@latest
 
 # yq via mise is the Go (mikefarah) build; apt yq is the Python wrapper.
-yq
+yq@latest

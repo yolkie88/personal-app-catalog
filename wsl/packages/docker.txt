@@ -1,9 +1,7 @@
-# Docker runtime should live in WSL for this catalog.
-# Use Docker Engine inside the main development distribution.
+# Docker Engine packages installed inside WSL. bootstrap.sh reads this file
+# directly for the final apt install step, so it is the single source of truth.
+# Repository prerequisites (ca-certificates, curl, gnupg) are handled separately.
 
-ca-certificates
-curl
-gnupg
 docker-ce
 docker-ce-cli
 containerd.io

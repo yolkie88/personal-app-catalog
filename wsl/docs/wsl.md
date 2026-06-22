@@ -92,6 +92,20 @@ Node.js、Python、uv、pnpm、mise 等主力开发工具链优先放在 WSL。
 
 Windows 侧保留 Python Install Manager，只用于少量 Windows 原生脚本或工具需求，不作为主项目开发 Python 来源。
 
+## mise 激活与工具来源
+
+`cli.txt`、`k8s.txt`、`docker.txt` 是 bootstrap 安装内容的唯一事实来源，脚本直接读取这些文件，不再单独硬编码工具列表。
+
+`bootstrap.sh --cli`（或 `--k8s`）会把下面这行幂等地写入 `~/.bashrc`，让 mise 管理的 node、python 等进入 PATH：
+
+```bash
+eval "$(mise activate bash)"
+```
+
+首次安装后需要新开一个 shell，或执行 `source ~/.bashrc`。使用 zsh 时改写 `mise activate zsh` 到 `~/.zshrc`。
+
+mise、Scoop、Docker 都通过上游安装脚本（`curl | sh`）引导，刻意不固定版本：好处是跟随上游修复，代价是恢复结果不完全可复现。
+
 ## 与 Windows 的分工
 
 | 场景 | 推荐位置 |

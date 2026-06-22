@@ -1,9 +1,10 @@
-# Kubernetes / K3s tools that should be used primarily inside WSL.
+# Kubernetes / K3s tools, installed and pinned through mise. bootstrap.sh reads
+# this file directly, so it is the single source of truth.
 
-kubectl
-helm
-k9s
-kubectx
-kubens
-stern
-oras
+kubectl@latest
+helm@latest
+k9s@latest
+kubectx@latest
+kubens@latest
+stern@latest
+oras@latest

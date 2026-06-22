@@ -100,18 +100,36 @@ install_apt_base() {
   fi
 }
 
-install_mise() {
-  if command -v mise >/dev/null 2>&1; then
+ensure_mise_shell_activation() {
+  local rc="${HOME}/.bashrc"
+  if [[ "$PLAN" == true ]]; then
+    echo "[plan] ensure 'mise activate bash' in ${rc}"
     return
   fi
-
-  echo "==> installing mise"
-  if [[ "$PLAN" == true ]]; then
-    echo "[plan] curl https://mise.run | sh"
-  else
-    curl https://mise.run | sh
-    export PATH="$HOME/.local/bin:$PATH"
+  if [[ -f "$rc" ]] && grep -qF 'mise activate bash' "$rc"; then
+    return
   fi
+  cat >> "$rc" <<'RC'
+
+# Put mise-managed toolchains (node, python, ...) on PATH.
+eval "$(mise activate bash)"
+RC
+  echo "==> Enabled mise activation in ${rc}. Open a new shell or run: source ${rc}"
+}
+
+install_mise() {
+  if ! command -v mise >/dev/null 2>&1; then
+    echo "==> installing mise"
+    if [[ "$PLAN" == true ]]; then
+      echo "[plan] curl https://mise.run | sh"
+    else
+      # mise is bootstrapped from its upstream installer (intentionally unpinned).
+      curl https://mise.run | sh
+      export PATH="$HOME/.local/bin:$PATH"
+    fi
+  fi
+
+  ensure_mise_shell_activation
 }
 
 mise_use_global() {
@@ -127,56 +145,54 @@ install_cli_tools() {
   install_mise
 
   echo "==> WSL CLI toolchain"
-  print_file_items "${PACKAGES_DIR}/cli.txt" | sed 's/^/  /'
+  local tools
+  mapfile -t tools < <(print_file_items "${PACKAGES_DIR}/cli.txt")
+  printf '  %s\n' "${tools[@]}"
 
-  mise_use_global "node@lts"
-  mise_use_global "python@latest"
-  mise_use_global "uv@latest"
-  mise_use_global "pnpm@latest"
-  mise_use_global "neovim@latest"
-  mise_use_global "lazygit@latest"
-  mise_use_global "delta@latest"
-  mise_use_global "zoxide@latest"
-  mise_use_global "starship@latest"
-  mise_use_global "just@latest"
-  mise_use_global "yq@latest"
+  for tool in "${tools[@]}"; do
+    mise_use_global "$tool"
+  done
 }
 
 install_k8s_tools() {
   install_mise
 
   echo "==> WSL Kubernetes toolchain"
-  print_file_items "${PACKAGES_DIR}/k8s.txt" | sed 's/^/  /'
+  local tools
+  mapfile -t tools < <(print_file_items "${PACKAGES_DIR}/k8s.txt")
+  printf '  %s\n' "${tools[@]}"
 
-  mise_use_global "kubectl@latest"
-  mise_use_global "helm@latest"
-  mise_use_global "k9s@latest"
-  mise_use_global "kubectx@latest"
-  mise_use_global "kubens@latest"
-  mise_use_global "stern@latest"
-  mise_use_global "oras@latest"
+  for tool in "${tools[@]}"; do
+    mise_use_global "$tool"
+  done
 }
 
 install_docker_engine() {
   echo "==> Docker Engine inside WSL"
-  print_file_items "${PACKAGES_DIR}/docker.txt" | sed 's/^/  /'
+  local packages
+  mapfile -t packages < <(print_file_items "${PACKAGES_DIR}/docker.txt")
+  printf '  %s\n' "${packages[@]}"
 
   run sudo apt-get update
   run sudo apt-get install -y ca-certificates curl gnupg
   run sudo install -m 0755 -d /etc/apt/keyrings
 
   if [[ "$PLAN" == true ]]; then
-    echo "[plan] install Docker apt repository and docker-ce packages"
+    echo "[plan] install Docker apt repository and docker engine packages"
   else
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    # shellcheck disable=SC1091  # /etc/os-release is provided by the distro
     . /etc/os-release
+    # shellcheck disable=SC2154  # VERSION_CODENAME comes from /etc/os-release
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
   fi
 
   run sudo apt-get update
-  run sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-  run sudo usermod -aG docker "$USER"
+  if [[ ${#packages[@]} -gt 0 ]]; then
+    run sudo apt-get install -y "${packages[@]}"
+  fi
+  run sudo usermod -aG docker "$(id -un)"
 
   echo "==> Docker installed. Restart this WSL session before using docker without sudo."
 }

@@ -1,0 +1,4 @@
+# Shell scripts and WSL package lists are consumed by bash inside WSL; keep them
+# LF on every platform so a Windows checkout (CRLF) cannot break them.
+*.sh text eol=lf
+wsl/packages/*.txt text eol=lf
