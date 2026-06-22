@@ -1,6 +1,6 @@
 # 应用目录
 
-本文件是当前个人应用目录的总览。`windows/manifests/` 是 Windows 可自动恢复部分；每个软件的用途、保留理由和恢复边界见 `apps.md`，WSL 开发环境见 `../../wsl/docs/wsl.md`，手工、敏感和非包管理器来源见 `sources.md` 和 `manual-boundaries.md`。
+本文件是当前个人应用目录的总览。`windows/manifests/` 是 Windows 可自动恢复部分；每个软件的用途、保留理由和恢复边界见 `apps.md`，WSL 开发环境见 `../../wsl/docs/wsl.md` 和 `../../wsl/docs/tools.md`，手工、敏感和非包管理器来源见 `sources.md` 和 `manual-boundaries.md`。
 
 ## 默认层
 
@@ -60,6 +60,7 @@ WSL 不通过 winget manifest 管理。相关文件位于 `../../wsl/`：
 - `../../wsl/packages/k8s.txt`：Kubernetes / K3s 工具链；
 - `../../wsl/packages/docker.txt`：Docker Engine 工具链；
 - `../../wsl/docs/wsl.md`：WSL 使用说明；
+- `../../wsl/docs/tools.md`：WSL 工具用途、常用方式和恢复边界；
 - `../../wsl/docs/wsl-boundaries.md`：WSL 敏感配置和数据边界。
 
 ## `all` 边界
