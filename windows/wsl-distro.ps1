@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string] $Distro = "Ubuntu-24.04",
+    [string] $Distro = "Ubuntu-26.04",
     [switch] $Install,
     [switch] $SetDefault,
     [switch] $NoLaunch,
