@@ -117,11 +117,22 @@ function Add-GuardedLine {
 function Invoke-PwshConfig {
     Write-Host "==> PowerShell profile and modules"
 
+    # Some modules need a minimum version: the managed profile uses PSReadLine
+    # prediction options that require 2.2.2+, newer than the inbox module on
+    # Windows PowerShell 5.1, so an "already present" old version must still update.
+    $minVersions = @{ "PSReadLine" = [version]"2.2.2" }
+
     $modules = @(Get-ListItems -Path (Join-Path $ConfigDir "pwsh/modules.txt"))
     foreach ($module in $modules) {
-        if (Get-Module -ListAvailable -Name $module) {
-            Write-Host "    module present: $module"
-            continue
+        $available = @(Get-Module -ListAvailable -Name $module)
+        if ($available.Count -gt 0) {
+            $min = $minVersions[$module]
+            $haveMax = ($available | Sort-Object Version -Descending | Select-Object -First 1).Version
+            if (-not $min -or $haveMax -ge $min) {
+                Write-Host "    module present: $module ($haveMax)"
+                continue
+            }
+            Write-Host "    module $module $haveMax is older than $min; updating"
         }
         if ($Plan.IsPresent) {
             Write-Host "    [plan] Install-Module $module -Scope CurrentUser"

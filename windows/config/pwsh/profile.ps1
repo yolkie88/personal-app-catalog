@@ -5,12 +5,17 @@
 # --- PSReadLine: history-aware predictions and richer editing -----------------
 if (Get-Module -ListAvailable -Name PSReadLine) {
     Import-Module PSReadLine
-    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-    Set-PSReadLineOption -PredictionViewStyle ListView
     Set-PSReadLineOption -EditMode Windows
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
     Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
     Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+    # Prediction view/source need PSReadLine 2.2.2+ (e.g. newer than the inbox
+    # module on Windows PowerShell 5.1); guard so an old version doesn't error on startup.
+    if ((Get-Module PSReadLine).Version -ge [version]"2.2.2") {
+        Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+        Set-PSReadLineOption -PredictionViewStyle ListView
+    }
 }
 
 # --- Optional modules: load only when present ---------------------------------

@@ -24,10 +24,19 @@ opt.scrolloff = 8
 opt.splitright = true
 opt.splitbelow = true
 opt.completeopt = "menu,menuone,noselect"
-opt.clipboard = "unnamedplus"
 
--- WSL clipboard bridge: unnamedplus only syncs with the Windows clipboard when a
--- bridge is present. Use win32yank.exe if it is on PATH; otherwise leave defaults.
+-- Clipboard: only route to the system "+" register when a provider exists, otherwise
+-- Neovim warns "No clipboard provider" on every yank/paste. Under WSL prefer
+-- win32yank.exe; fall back to the usual Linux providers if present.
+local has_clipboard_provider = vim.fn.executable("win32yank.exe") == 1
+  or vim.fn.executable("xclip") == 1
+  or vim.fn.executable("xsel") == 1
+  or vim.fn.executable("wl-copy") == 1
+if has_clipboard_provider then
+  opt.clipboard = "unnamedplus"
+end
+
+-- win32yank bridge so unnamedplus actually syncs with the Windows clipboard in WSL.
 if vim.fn.executable("win32yank.exe") == 1 then
   vim.g.clipboard = {
     name = "win32yank",
