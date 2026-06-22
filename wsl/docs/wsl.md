@@ -20,6 +20,31 @@ Windows 侧保留：
 - DBeaver、Bruno、SourceGit、DevToys 等 Windows GUI 开发工具；
 - PowerToys、Everything、Sysinternals、硬件和磁盘诊断工具。
 
+## 发行版基线
+
+WSL 本身只是 Windows 组件；必须先安装至少一个 Linux 发行版，才能运行 `bash`、`apt`、`./wsl/bootstrap.sh` 等命令。
+
+本项目默认发行版基线为：
+
+```text
+Ubuntu-24.04
+```
+
+Windows 侧先检查或安装发行版：
+
+```powershell
+.\windows\wsl-distro.ps1 -Plan
+.\windows\wsl-distro.ps1 -Install -Distro Ubuntu-24.04 -SetDefault
+```
+
+可用发行版名称以本机命令为准：
+
+```powershell
+wsl --list --online
+```
+
+首次安装发行版后，需要启动该发行版一次，创建 Linux 用户和密码。之后再进入 WSL 执行本项目的 `wsl/` 脚本。
+
 ## 推荐目录
 
 代码仓库建议放在 WSL Linux 文件系统：
