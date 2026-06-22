@@ -9,9 +9,9 @@
 | `core` | 是 | Windows 基础环境 | Chrome, NanaZip, PowerShell, Windows Terminal, Git, PowerToys, Everything, UniGetUI, LocalSend, Bitwarden |
 | `agentic-dev` | 是 | Agentic coding Windows 入口 | VS Code, Codex, Claude, GitHub CLI, WSL, Python Install Manager |
 
-`default` 等同于 `core + agentic-dev`。AI 编程工具主线只保留 Codex 和 Claude；Copilot 不进入个人恢复目录。
+`default` 等同于 `core + agentic-dev`。具体安装项以 `windows/manifests/winget-core.json` 和 `windows/manifests/winget-agentic-dev.json` 为准。
 
-Docker、Node.js、Kubernetes CLI 和主力开发 CLI 优先放在 WSL。Python Install Manager 只作为 Windows 原生 Python 入口，不作为主项目开发 Python 来源。播放器默认跟随 `daily` profile 中的 PotPlayer。
+Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。Python Install Manager 只作为 Windows 原生 Python 入口，不作为主项目开发 Python 来源。
 
 ## 显式角色层
 
