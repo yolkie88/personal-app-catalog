@@ -87,6 +87,7 @@ Docker Engine 安装到 WSL：
 | `windows/docs/operations.md` | Windows 安装、更新、维护流程 |
 | `windows/docs/recovery-playbook.md` | 新设备恢复顺序和人工边界 |
 | `wsl/docs/wsl.md` | WSL-first 开发环境说明 |
+| `wsl/docs/tools.md` | WSL 工具用途、常用方式和恢复边界 |
 | `wsl/docs/wsl-boundaries.md` | WSL 敏感配置和数据边界 |
 
 ## 目录规则
