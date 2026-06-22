@@ -5,7 +5,6 @@
     {
       "Packages": [
         { "PackageIdentifier": "Microsoft.VisualStudioCode" },
-        { "PackageIdentifier": "OpenAI.Codex" },
         { "PackageIdentifier": "Anthropic.Claude" },
         { "PackageIdentifier": "GitHub.cli" },
         { "PackageIdentifier": "Microsoft.WSL" },
