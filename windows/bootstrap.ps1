@@ -127,6 +127,66 @@ function Import-WingetManifest {
     Add-RunResult -Type "winget" -Name $Name -Status "imported" -Packages $packages
 }
 
+function Get-MsstoreManifestPath {
+    param([string] $Name)
+
+    Join-Path $ManifestDir "msstore-$Name.txt"
+}
+
+function Get-ListPackages {
+    param([string] $Path)
+
+    if (-not (Test-Path $Path)) {
+        return @()
+    }
+
+    Get-Content $Path |
+        ForEach-Object { $_.Trim() } |
+        Where-Object { $_ -and -not $_.StartsWith("#") }
+}
+
+function Install-MsstorePackages {
+    param(
+        [string] $Name,
+        [switch] $PlanMode
+    )
+
+    $path = Get-MsstoreManifestPath -Name $Name
+    if (-not (Test-Path $path)) {
+        return
+    }
+
+    $packages = @(Get-ListPackages -Path $path)
+    if ($packages.Count -eq 0) {
+        Add-RunResult -Type "msstore" -Name $Name -Status "empty" -Message "No active package IDs in $path"
+        return
+    }
+
+    if ($PlanMode.IsPresent) {
+        Write-Host "==> Plan: Microsoft Store packages: $Name"
+        foreach ($package in $packages) {
+            Write-Host "    $package"
+        }
+        Add-RunResult -Type "msstore" -Name $Name -Status "planned" -Packages $packages
+        return
+    }
+
+    foreach ($package in $packages) {
+        Write-Host "==> Installing Microsoft Store package: $package"
+        & winget install --id $package -s msstore `
+            --accept-package-agreements `
+            --accept-source-agreements `
+            --disable-interactivity
+
+        if ($LASTEXITCODE -ne 0) {
+            Add-RunResult -Type "msstore" -Name $package -Status "failed" -Packages @($package) -Message "winget install msstore exited with code $LASTEXITCODE"
+            throw "Microsoft Store package '$package' failed with exit code $LASTEXITCODE."
+        }
+
+        Add-RunResult -Type "msstore" -Name $package -Status "installed" -Packages @($package)
+    }
+}
+
 function Ensure-Scoop {
     if (Get-Command scoop -ErrorAction SilentlyContinue) {
         return
@@ -137,13 +197,7 @@ function Ensure-Scoop {
 
 function Get-ScoopPackages {
     $listPath = Join-Path $ManifestDir "scoop-cli.txt"
-    if (-not (Test-Path $listPath)) {
-        return @()
-    }
-
-    Get-Content $listPath |
-        ForEach-Object { $_.Trim() } |
-        Where-Object { $_ -and -not $_.StartsWith("#") }
+    @(Get-ListPackages -Path $listPath)
 }
 
 function Install-ScoopPackages {
@@ -259,6 +313,7 @@ try {
 
     foreach ($profileName in $profilesToInstall) {
         Import-WingetManifest -Name $profileName -PlanMode:$Plan.IsPresent
+        Install-MsstorePackages -Name $profileName -PlanMode:$Plan.IsPresent
     }
 
     if ($WithScoop.IsPresent) {
