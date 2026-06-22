@@ -12,12 +12,39 @@ $ReadmePath = Join-Path $RepoRoot "README.md"
 $GitignorePath = Join-Path $RepoRoot ".gitignore"
 $WslDir = Join-Path $RepoRoot "wsl"
 $WslPackagesDir = Join-Path $WslDir "packages"
+$MarkdownTick = [char]96
 
 $Failures = New-Object System.Collections.Generic.List[string]
 
 function Add-Failure {
     param([string] $Message)
     $Failures.Add($Message) | Out-Null
+}
+
+function Get-MarkdownCodeTokensFromLine {
+    param([string] $Line)
+
+    $tokens = New-Object System.Collections.Generic.List[string]
+    if ($null -eq $Line) {
+        return @()
+    }
+
+    $start = $Line.IndexOf($MarkdownTick)
+    while ($start -ge 0) {
+        $end = $Line.IndexOf($MarkdownTick, $start + 1)
+        if ($end -lt 0) {
+            break
+        }
+
+        $length = $end - $start - 1
+        if ($length -gt 0) {
+            $tokens.Add($Line.Substring($start + 1, $length)) | Out-Null
+        }
+
+        $start = $Line.IndexOf($MarkdownTick, $end + 1)
+    }
+
+    $tokens.ToArray()
 }
 
 function Get-BootstrapProfiles {
@@ -113,22 +140,33 @@ function Get-AllSetFromCatalog {
 
     $lines = Get-Content -Path $CatalogPath
     $set = New-Object System.Collections.Generic.List[string]
+    $inAllSection = $false
     $inIncludeBlock = $false
 
     foreach ($line in $lines) {
-        if ($line -match '^`all` .*只包含') {
-            $inIncludeBlock = $true
+        if (-not $inAllSection) {
+            if ($line.Contains("##") -and $line.Contains("all") -and $line.Contains("边界")) {
+                $inAllSection = $true
+            }
             continue
         }
 
-        if ($inIncludeBlock -and $line -match '^`all` .*不包含') {
+        if (-not $inIncludeBlock) {
+            if ($line.Contains("只包含")) {
+                $inIncludeBlock = $true
+            }
+            continue
+        }
+
+        if ($line.Contains("不包含")) {
             break
         }
 
-        if ($inIncludeBlock) {
-            $match = [regex]::Match($line, '^-\s+`([^`]+)`')
-            if ($match.Success) {
-                $set.Add($match.Groups[1].Value) | Out-Null
+        if ($line.TrimStart().StartsWith("- ")) {
+            foreach ($token in Get-MarkdownCodeTokensFromLine -Line $line) {
+                if ($token -match '^[a-z0-9][a-z0-9-]*$') {
+                    $set.Add($token) | Out-Null
+                }
             }
         }
     }
@@ -186,12 +224,12 @@ function Get-ProfileTokensFromMarkdown {
         return @()
     }
 
-    $content = Get-Content -Path $Path -Raw
     $tokens = New-Object System.Collections.Generic.List[string]
-    foreach ($match in [regex]::Matches($content, '`([^`]+)`')) {
-        $value = $match.Groups[1].Value
-        if ($value -match '^[a-z0-9][a-z0-9-]*$') {
-            $tokens.Add($value) | Out-Null
+    foreach ($line in Get-Content -Path $Path) {
+        foreach ($token in Get-MarkdownCodeTokensFromLine -Line $line) {
+            if ($token -match '^[a-z0-9][a-z0-9-]*$') {
+                $tokens.Add($token) | Out-Null
+            }
         }
     }
 
