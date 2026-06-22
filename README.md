@@ -21,7 +21,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\windows\bootstrap.ps1 -Report
 ```
 
-默认层由 `bootstrap.ps1` 解析为 `core + agentic-dev`，具体安装项以 `windows/manifests/` 下对应 manifest 为准。Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。
+默认层由 `bootstrap.ps1` 解析为 `core + agentic-dev`，具体安装项以 `windows/manifests/` 下对应 manifest 为准。`winget-*.json` 走 winget 源，`msstore-*.txt` 走 Microsoft Store 源。Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。
 
 WSL 侧先校验和预览，再初始化：
 
