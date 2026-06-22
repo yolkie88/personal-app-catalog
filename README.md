@@ -23,9 +23,10 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 默认只安装 `core + agentic-dev`。AI 编程工具主线只保留 Codex 和 Claude。Docker、Node.js、Kubernetes CLI 和主力开发 CLI 优先放在 WSL。
 
-WSL 侧先预览，再初始化：
+WSL 侧先校验和预览，再初始化：
 
 ```bash
+bash wsl/validate.sh
 ./wsl/bootstrap.sh --base --cli --k8s --plan
 ./wsl/bootstrap.sh --base --cli --k8s
 ```
@@ -99,4 +100,4 @@ Docker Engine 安装到 WSL：
 - 同一应用只保留一个主来源。
 - Store、GitHub Releases、官方安装器、语言包管理器、Docker/WSL 和便携应用可以进入目录，但要明确是否可自动恢复。
 - 订阅、节点、授权码、设备码、私钥、token、备份密钥和模型数据不进入 Git。
-- 提交前运行 `windows/validate.ps1`；恢复前优先使用 `-Plan -Report` 确认将要执行的安装。
+- 提交前运行 `windows/validate.ps1` 和 `bash wsl/validate.sh`；恢复前优先使用 `-Plan -Report` 确认将要执行的安装。
