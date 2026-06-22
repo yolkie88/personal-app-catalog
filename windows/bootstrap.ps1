@@ -23,23 +23,23 @@ function Resolve-Profiles {
     foreach ($item in $InputProfiles) {
         switch ($item) {
             "default" {
-                $resolved.Add("core")
-                $resolved.Add("agentic-dev")
+                $resolved.Add("core") | Out-Null
+                $resolved.Add("agentic-dev") | Out-Null
             }
             "all" {
-                $resolved.Add("core")
-                $resolved.Add("agentic-dev")
-                $resolved.Add("daily")
-                $resolved.Add("media")
-                $resolved.Add("gaming")
+                $resolved.Add("core") | Out-Null
+                $resolved.Add("agentic-dev") | Out-Null
+                $resolved.Add("daily") | Out-Null
+                $resolved.Add("media") | Out-Null
+                $resolved.Add("gaming") | Out-Null
             }
             default {
-                $resolved.Add($item)
+                $resolved.Add($item) | Out-Null
             }
         }
     }
 
-    $resolved | Select-Object -Unique
+    @($resolved.ToArray() | Select-Object -Unique)
 }
 
 function Add-RunResult {
@@ -80,7 +80,7 @@ function Get-WingetManifestPackages {
     foreach ($source in @($manifest.Sources)) {
         foreach ($package in @($source.Packages)) {
             if ($package.PackageIdentifier) {
-                $packages.Add([string] $package.PackageIdentifier)
+                $packages.Add([string] $package.PackageIdentifier) | Out-Null
             }
         }
     }
@@ -103,7 +103,7 @@ function Import-WingetManifest {
 
     $packages = @(Get-WingetManifestPackages -Name $Name)
 
-    if ($PlanMode) {
+    if ($PlanMode.IsPresent) {
         Write-Host "==> Plan: winget manifest: $Name"
         foreach ($package in $packages) {
             Write-Host "    $package"
@@ -132,21 +132,7 @@ function Ensure-Scoop {
         return
     }
 
-    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-        Write-Host "==> Installing Git before Scoop..."
-        & winget install -e --id Git.Git --source winget `
-            --accept-package-agreements `
-            --accept-source-agreements `
-            --disable-interactivity
-
-        if ($LASTEXITCODE -ne 0) {
-            throw "Git installation failed with exit code $LASTEXITCODE."
-        }
-    }
-
-    Write-Host "==> Installing Scoop..."
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-    Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+    throw "Scoop is not installed. Install Scoop first, then rerun this command with -WithScoop."
 }
 
 function Get-ScoopPackages {
@@ -172,7 +158,7 @@ function Install-ScoopPackages {
 
     $packages = @(Get-ScoopPackages)
 
-    if ($PlanMode) {
+    if ($PlanMode.IsPresent) {
         Write-Host "==> Plan: Scoop packages"
         foreach ($package in $packages) {
             Write-Host "    $package"
@@ -204,11 +190,15 @@ function Install-ScoopPackages {
 }
 
 function Write-RunReport {
-    param([string[]] $ResolvedProfiles)
+    param([object[]] $ResolvedProfiles)
 
-    if (-not $Report) {
+    if (-not $Report.IsPresent) {
         return
     }
+
+    $resolvedProfileNames = @($ResolvedProfiles | ForEach-Object { [string] $_ })
+    $inputProfileNames = @($Profile | ForEach-Object { [string] $_ })
+    $resultItems = @($RunResults.ToArray())
 
     New-Item -ItemType Directory -Force -Path $ReportDir | Out-Null
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -217,27 +207,27 @@ function Write-RunReport {
 
     $payload = [pscustomobject]@{
         Timestamp = (Get-Date).ToString("o")
-        InputProfiles = @($Profile)
-        ResolvedProfiles = @($ResolvedProfiles)
-        WithScoop = [bool] $WithScoop
-        Plan = [bool] $Plan
-        Results = @($RunResults)
+        InputProfiles = $inputProfileNames
+        ResolvedProfiles = $resolvedProfileNames
+        WithScoop = $WithScoop.IsPresent
+        Plan = $Plan.IsPresent
+        Results = $resultItems
     }
 
-    $payload | ConvertTo-Json -Depth 8 | Out-File -FilePath $jsonPath -Encoding utf8
+    ConvertTo-Json -InputObject $payload -Depth 8 | Out-File -FilePath $jsonPath -Encoding utf8
 
     $lines = New-Object System.Collections.Generic.List[string]
     $lines.Add("# Bootstrap report") | Out-Null
     $lines.Add("") | Out-Null
     $lines.Add("Timestamp: $($payload.Timestamp)") | Out-Null
-    $lines.Add("Input profiles: $($Profile -join ', ')") | Out-Null
-    $lines.Add("Resolved profiles: $($ResolvedProfiles -join ', ')") | Out-Null
-    $lines.Add("With Scoop: $([bool] $WithScoop)") | Out-Null
-    $lines.Add("Plan mode: $([bool] $Plan)") | Out-Null
+    $lines.Add("Input profiles: $($inputProfileNames -join ', ')") | Out-Null
+    $lines.Add("Resolved profiles: $($resolvedProfileNames -join ', ')") | Out-Null
+    $lines.Add("With Scoop: $($WithScoop.IsPresent)") | Out-Null
+    $lines.Add("Plan mode: $($Plan.IsPresent)") | Out-Null
     $lines.Add("") | Out-Null
     $lines.Add("## Results") | Out-Null
 
-    foreach ($result in $RunResults) {
+    foreach ($result in $resultItems) {
         $packages = @($result.Packages) -join ", "
         if ([string]::IsNullOrWhiteSpace($packages)) {
             $packages = "-"
@@ -253,7 +243,7 @@ function Write-RunReport {
 $profilesToInstall = @(Resolve-Profiles -InputProfiles $Profile)
 
 try {
-    if ($Plan) {
+    if ($Plan.IsPresent) {
         Write-Host "==> Plan mode enabled. No packages will be installed."
     } else {
         if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
@@ -268,14 +258,14 @@ try {
     }
 
     foreach ($profileName in $profilesToInstall) {
-        Import-WingetManifest -Name $profileName -PlanMode:$Plan
+        Import-WingetManifest -Name $profileName -PlanMode:$Plan.IsPresent
     }
 
-    if ($WithScoop) {
-        Install-ScoopPackages -PlanMode:$Plan
+    if ($WithScoop.IsPresent) {
+        Install-ScoopPackages -PlanMode:$Plan.IsPresent
     }
 
-    if ($Plan) {
+    if ($Plan.IsPresent) {
         Write-Host "==> Plan completed."
     } else {
         Write-Host "==> Bootstrap completed."
