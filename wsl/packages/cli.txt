@@ -12,9 +12,6 @@ delta
 zoxide
 starship
 just
-hyperfine
-tokei
-bottom
-duf
-dust
-graphviz
+
+# yq via mise is the Go (mikefarah) build; apt yq is the Python wrapper.
+yq

@@ -16,7 +16,6 @@ rsync
 
 # Common CLI utilities available from Ubuntu/Debian repositories.
 jq
-yq
 ripgrep
 fd-find
 fzf

@@ -139,11 +139,7 @@ install_cli_tools() {
   mise_use_global "zoxide@latest"
   mise_use_global "starship@latest"
   mise_use_global "just@latest"
-  mise_use_global "hyperfine@latest"
-  mise_use_global "tokei@latest"
-  mise_use_global "bottom@latest"
-  mise_use_global "duf@latest"
-  mise_use_global "dust@latest"
+  mise_use_global "yq@latest"
 }
 
 install_k8s_tools() {
