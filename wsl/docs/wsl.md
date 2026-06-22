@@ -27,14 +27,14 @@ WSL 本身只是 Windows 组件；必须先安装至少一个 Linux 发行版，
 本项目默认发行版基线为：
 
 ```text
-Ubuntu-24.04
+Ubuntu-26.04
 ```
 
 Windows 侧先检查或安装发行版：
 
 ```powershell
 .\windows\wsl-distro.ps1 -Plan
-.\windows\wsl-distro.ps1 -Install -Distro Ubuntu-24.04 -SetDefault
+.\windows\wsl-distro.ps1 -Install -Distro Ubuntu-26.04 -SetDefault
 ```
 
 可用发行版名称以本机命令为准：
