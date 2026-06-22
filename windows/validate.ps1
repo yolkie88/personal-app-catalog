@@ -125,16 +125,6 @@ function Get-ManifestProfiles {
         Sort-Object -Unique
 }
 
-function Get-MsstoreProfiles {
-    if (-not (Test-Path $ManifestDir)) {
-        return @()
-    }
-
-    Get-ChildItem -Path $ManifestDir -Filter "msstore-*.txt" |
-        ForEach-Object { $_.BaseName -replace '^msstore-', '' } |
-        Sort-Object -Unique
-}
-
 function Test-WingetManifests {
     $seen = @{}
 
@@ -359,8 +349,9 @@ function Test-Gitignore {
     }
 }
 
-function Test-WslFiles {
+function Test-RequiredFiles {
     $required = @(
+        "windows/wsl-distro.ps1",
         "wsl/bootstrap.sh",
         "wsl/validate.sh",
         "wsl/packages/apt-base.txt",
@@ -375,7 +366,7 @@ function Test-WslFiles {
     foreach ($relative in $required) {
         $path = Join-Path $RepoRoot $relative
         if (-not (Test-Path $path)) {
-            Add-Failure "Missing WSL file: $relative"
+            Add-Failure "Missing required file: $relative"
         }
     }
 }
@@ -426,7 +417,7 @@ Test-DocumentedProfiles -BootstrapProfiles $bootstrapProfiles
 Test-AllProfileSet
 Test-ScoopList
 Test-Gitignore
-Test-WslFiles
+Test-RequiredFiles
 Test-WslPackageLists
 Test-WslFirstBoundaries
 
