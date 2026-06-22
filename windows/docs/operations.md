@@ -16,12 +16,13 @@ bash wsl/validate.sh
 
 - `bootstrap.ps1` 支持的 profile 和 `windows/manifests/winget-*.json` 是否对应；
 - winget manifest 是否是合法 JSON，且包含 `PackageIdentifier`；
+- Microsoft Store manifest 是否匹配已有 profile，且 Store ID 是否重复；
 - 不同 manifest 中是否有重复包；
 - 每个 `bootstrap.ps1` profile 是否都在 README 或 `catalog.md` 有记录；
 - `all` 在 `bootstrap.ps1` 与 `catalog.md` 中的集合是否一致；
 - `scoop-cli.txt` 是否存在且包含有效包；
 - WSL 文件、包清单、mise 版本选择器和 Docker 清单是否有效；
-- Windows `agentic-dev` 是否错误包含 Docker Desktop 或 Node.js LTS；
+- Windows `agentic-dev` 是否错误包含 Docker Desktop、Node.js LTS 或 Codex CLI 包；
 - `.gitignore` 是否包含导出、报告和关键本地数据的忽略规则。
 
 CI（`.github/workflows/validate.yml`）会运行 `validate.ps1`、`wsl/validate.sh`，并对 `wsl/bootstrap.sh` 和 `wsl/validate.sh` 运行 `bash -n` 与 `shellcheck`。
@@ -34,7 +35,7 @@ CI（`.github/workflows/validate.yml`）会运行 `validate.ps1`、`wsl/validate
 .\windows\bootstrap.ps1 -Plan -Report
 ```
 
-`-Plan` 只展示将要安装的 profile 和包，不执行安装。`-Report` 会生成 `windows/reports/bootstrap-report-*.json` 和 `windows/reports/bootstrap-report-*.txt`。
+`-Plan` 只展示将要安装的 profile 和包，不执行安装。它会同时显示 winget JSON manifest、Microsoft Store txt manifest 和 Scoop 清单中的安装计划。`-Report` 会生成 `windows/reports/bootstrap-report-*.json` 和 `windows/reports/bootstrap-report-*.txt`。
 
 组合 profile 也建议先预览：
 
@@ -73,6 +74,8 @@ CI（`.github/workflows/validate.yml`）会运行 `validate.ps1`、`wsl/validate
 .\windows\bootstrap.ps1 -Profile local-ai -Report
 .\windows\bootstrap.ps1 -Profile proxy-core -Report
 ```
+
+Microsoft Store 包跟随 profile 自动安装。例如 `agentic-dev` 会读取 `windows/manifests/msstore-agentic-dev.txt`。
 
 Scoop CLI：
 
@@ -154,10 +157,10 @@ mise upgrade
 
 ## 维护流程
 
-1. 新软件先判断来源类型：winget、Scoop、Store、GitHub、官方安装器、语言包管理器、Docker/WSL、便携。
+1. 新软件先判断来源类型：winget、Microsoft Store、Scoop、GitHub、官方安装器、语言包管理器、Docker/WSL、便携。
 2. 判断是否可自动恢复。
 3. 判断是否涉及账号、授权、设备绑定或本地专属配置。
-4. Windows GUI 工具放入合适 winget profile。
+4. Windows GUI 工具按来源放入合适的 `winget-*.json` 或 `msstore-*.txt`。
 5. 开发 CLI、K8s、Docker、Node.js、Python 主力工具优先放入 `wsl/` 清单。
 6. 如果不可自动恢复，写入 `sources.md`、`manual-boundaries.md` 或 `wsl/docs/wsl-boundaries.md`。
 7. 如果只是尝鲜，不进入 manifest。
