@@ -9,7 +9,8 @@
         { "PackageIdentifier": "ShareX.ShareX" },
         { "PackageIdentifier": "PDFArranger.PDFArranger" },
         { "PackageIdentifier": "KDE.Okular" },
-        { "PackageIdentifier": "DuongDieuPhap.ImageGlass" }
+        { "PackageIdentifier": "DuongDieuPhap.ImageGlass" },
+        { "PackageIdentifier": "JohnMacFarlane.Pandoc" }
       ],
       "SourceDetails": {
         "Argument": "https://cdn.winget.microsoft.com/cache",

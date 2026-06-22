@@ -20,7 +20,7 @@ Docker、Node.js、Kubernetes CLI 和主力开发 CLI 优先放在 WSL。Python 
 | Profile | 自动安装 | 定位 | 应用 |
 |---|---|---|---|
 | `daily` | 是 | 主力个人设备日常工具 | Obsidian, Typora, PixPin, SumatraPDF, MediaInfo, PotPlayer |
-| `daily-extra` | 是 | 日常增强候选 | Ditto, QuickLook, ShareX, PDFArranger, Okular, ImageGlass |
+| `daily-extra` | 是 | 日常增强候选 | Ditto, QuickLook, ShareX, PDFArranger, Okular, ImageGlass, Pandoc |
 | `backup` | 是，配置手工 | 备份客户端 | Kopia UI |
 | `backup-cli` | 是，仓库配置手工 | Windows 侧备份和远端同步 CLI | restic, rclone |
 | `network` | 是，账号手工 | 可信网络和远程文件 | Tailscale, WinSCP |
