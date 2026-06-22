@@ -48,7 +48,7 @@ Docker、Node.js、Kubernetes CLI 和主力开发 CLI 优先放在 WSL。Python 
 
 `optional-oss` 当前包含：KeePassXC, Flameshot, VSCodium, Meld。
 
-`scoop-cli` 当前包含：`ripgrep`, `fd`, `fzf`, `jq`, `yq`, `bat`, `delta`, `lazygit`, `zoxide`, `starship`, `uv`, `pnpm`, `neovim`, `just`, `hyperfine`, `tokei`, `bottom`, `duf`, `dust`。这些工具在 Windows 侧只作为备用；主力开发环境优先使用 WSL 版本。
+`scoop-cli` 当前包含：`ripgrep`, `fd`, `fzf`, `jq`, `yq`, `bat`, `delta`, `lazygit`, `zoxide`, `starship`, `uv`, `pnpm`, `neovim`, `just`。这些工具在 Windows 侧只作为备用；主力开发环境优先使用 WSL 版本。
 
 ## WSL 层
 

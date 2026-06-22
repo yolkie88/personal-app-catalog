@@ -17,11 +17,6 @@ uv
 pnpm
 neovim
 just
-hyperfine
-tokei
-bottom
-duf
-dust
 
 # Only enable this if scripts explicitly need GNU/coreutils behavior.
 # uutils-coreutils
