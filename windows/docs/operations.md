@@ -8,6 +8,10 @@
 .\windows\validate.ps1
 ```
 
+```bash
+bash wsl/validate.sh
+```
+
 校验内容包括：
 
 - `bootstrap.ps1` 支持的 profile 和 `windows/manifests/winget-*.json` 是否对应；
@@ -16,9 +20,11 @@
 - 每个 `bootstrap.ps1` profile 是否都在 README 或 `catalog.md` 有记录；
 - `all` 在 `bootstrap.ps1` 与 `catalog.md` 中的集合是否一致；
 - `scoop-cli.txt` 是否存在且包含有效包；
+- WSL 文件、包清单、mise 版本选择器和 Docker 清单是否有效；
+- Windows `agentic-dev` 是否错误包含 Docker Desktop 或 Node.js LTS；
 - `.gitignore` 是否包含导出、报告和关键本地数据的忽略规则。
 
-CI（`.github/workflows/validate.yml`）会运行 `validate.ps1`，并对 `wsl/bootstrap.sh` 运行 `bash -n` 和 `shellcheck`。
+CI（`.github/workflows/validate.yml`）会运行 `validate.ps1`、`wsl/validate.sh`，并对 `wsl/bootstrap.sh` 和 `wsl/validate.sh` 运行 `bash -n` 与 `shellcheck`。
 
 ## Windows 侧预览
 
@@ -82,9 +88,10 @@ Scoop CLI：
 
 ## WSL 侧初始化
 
-WSL 侧是主开发、运维、Docker 和 CLI 执行环境。先预览：
+WSL 侧是主开发、运维、Docker 和 CLI 执行环境。先校验和预览：
 
 ```bash
+bash wsl/validate.sh
 ./wsl/bootstrap.sh --base --cli --k8s --plan
 ```
 
@@ -154,7 +161,7 @@ mise upgrade
 5. 开发 CLI、K8s、Docker、Node.js、Python 主力工具优先放入 `wsl/` 清单。
 6. 如果不可自动恢复，写入 `sources.md`、`manual-boundaries.md` 或 `wsl/docs/wsl-boundaries.md`。
 7. 如果只是尝鲜，不进入 manifest。
-8. 修改完成后执行 `windows/validate.ps1`。
+8. 修改完成后执行 `windows/validate.ps1` 和 `bash wsl/validate.sh`。
 
 ## Git 初始化
 
