@@ -12,6 +12,9 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 
 Write-Host "==> Updating winget sources..."
 winget source update
+if ($LASTEXITCODE -ne 0) {
+    throw "winget source update failed with exit code $LASTEXITCODE."
+}
 
 if ($All) {
     Write-Host "==> Upgrading all winget-managed/matched apps..."

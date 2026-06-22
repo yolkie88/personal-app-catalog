@@ -84,6 +84,62 @@ function Test-WingetManifests {
     }
 }
 
+function Get-AllSetFromBootstrap {
+    if (-not (Test-Path $BootstrapPath)) {
+        return @()
+    }
+
+    $content = Get-Content -Path $BootstrapPath -Raw
+    $match = [regex]::Match($content, '"all"\s*\{(?<body>.*?)\}', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $match.Success) {
+        Add-Failure "bootstrap.ps1 has no 'all' resolution block."
+        return @()
+    }
+
+    $set = New-Object System.Collections.Generic.List[string]
+    foreach ($entry in [regex]::Matches($match.Groups["body"].Value, '\.Add\("([^"]+)"\)')) {
+        $set.Add($entry.Groups[1].Value) | Out-Null
+    }
+
+    $set.ToArray() | Sort-Object -Unique
+}
+
+function Get-AllSetFromCatalog {
+    if (-not (Test-Path $CatalogPath)) {
+        return @()
+    }
+
+    $content = Get-Content -Path $CatalogPath -Raw
+    $match = [regex]::Match($content, '只包含[：:](?<body>.*?)不包含', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $match.Success) {
+        Add-Failure "catalog.md has no 'all' inclusion section."
+        return @()
+    }
+
+    $set = New-Object System.Collections.Generic.List[string]
+    foreach ($entry in [regex]::Matches($match.Groups["body"].Value, '`([a-z0-9][a-z0-9-]*)`')) {
+        $value = $entry.Groups[1].Value
+        if ($value -ne "all") {
+            $set.Add($value) | Out-Null
+        }
+    }
+
+    $set.ToArray() | Sort-Object -Unique
+}
+
+function Test-AllProfileSet {
+    $fromBootstrap = @(Get-AllSetFromBootstrap)
+    $fromCatalog = @(Get-AllSetFromCatalog)
+
+    if ($fromBootstrap.Count -eq 0 -or $fromCatalog.Count -eq 0) {
+        return
+    }
+
+    if (Compare-Object -ReferenceObject $fromBootstrap -DifferenceObject $fromCatalog) {
+        Add-Failure "'all' set differs: bootstrap.ps1 = [$($fromBootstrap -join ', ')], catalog.md = [$($fromCatalog -join ', ')]."
+    }
+}
+
 function Test-ProfileMapping {
     param(
         [string[]] $BootstrapProfiles,
@@ -177,6 +233,7 @@ $manifestProfiles = @(Get-ManifestProfiles)
 Test-WingetManifests
 Test-ProfileMapping -BootstrapProfiles $bootstrapProfiles -ManifestProfiles $manifestProfiles
 Test-DocumentedProfiles -BootstrapProfiles $bootstrapProfiles
+Test-AllProfileSet
 Test-ScoopList
 Test-Gitignore
 

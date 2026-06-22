@@ -13,9 +13,12 @@
 - `bootstrap.ps1` 支持的 profile 和 `windows/manifests/winget-*.json` 是否对应；
 - winget manifest 是否是合法 JSON，且包含 `PackageIdentifier`；
 - 不同 manifest 中是否有重复包；
-- README 和 `catalog.md` 中的 profile 名是否能被 bootstrap 接受；
+- 每个 `bootstrap.ps1` profile 是否都在 README 或 `catalog.md` 有记录；
+- `all` 在 `bootstrap.ps1` 与 `catalog.md` 中的集合是否一致；
 - `scoop-cli.txt` 是否存在且包含有效包；
 - `.gitignore` 是否包含导出、报告和关键本地数据的忽略规则。
+
+CI（`.github/workflows/validate.yml`）会运行 `validate.ps1`，并对 `wsl/bootstrap.sh` 运行 `bash -n` 和 `shellcheck`。
 
 ## Windows 侧预览
 
