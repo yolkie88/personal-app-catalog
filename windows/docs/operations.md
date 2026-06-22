@@ -95,10 +95,10 @@ Scoop CLI：
 
 ## WSL 发行版准备
 
-WSL 脚本必须在已安装的 Linux 发行版里执行。默认发行版基线是 `Ubuntu-24.04`：
+WSL 脚本必须在已安装的 Linux 发行版里执行。默认发行版基线是 `Ubuntu-26.04`：
 
 ```powershell
-.\windows\wsl-distro.ps1 -Install -Distro Ubuntu-24.04 -SetDefault
+.\windows\wsl-distro.ps1 -Install -Distro Ubuntu-26.04 -SetDefault
 ```
 
 如果要查看本机可安装的发行版名称：
