@@ -20,7 +20,7 @@ require_file() {
 
 active_items() {
   local file="$1"
-  grep -Ev '^\s*(#|$)' "$file" || true
+  grep -Ev '^[[:space:]]*(#|$)' "$file" || true
 }
 
 test_list_file() {
