@@ -57,6 +57,7 @@ test_required_files() {
     "${SCRIPT_DIR}/packages/k8s.txt"
     "${SCRIPT_DIR}/packages/docker.txt"
     "${SCRIPT_DIR}/docs/wsl.md"
+    "${SCRIPT_DIR}/docs/tools.md"
     "${SCRIPT_DIR}/docs/wsl-boundaries.md"
   )
 
