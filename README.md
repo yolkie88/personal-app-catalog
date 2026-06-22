@@ -6,12 +6,13 @@
 
 ## 快速使用
 
-先做 Windows 侧结构校验和安装预览：
+先做 Windows 侧结构校验、WSL 发行版检查和安装预览：
 
 ```powershell
 cd <repo-path>
 Set-ExecutionPolicy -Scope Process Bypass
 .\windows\validate.ps1
+.\windows\wsl-distro.ps1 -Plan
 .\windows\bootstrap.ps1 -Plan -Report
 ```
 
@@ -23,7 +24,13 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 默认层由 `bootstrap.ps1` 解析为 `core + agentic-dev`，具体安装项以 `windows/manifests/` 下对应 manifest 为准。`winget-*.json` 走 winget 源，`msstore-*.txt` 走 Microsoft Store 源。Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。
 
-WSL 侧先校验和预览，再初始化：
+WSL 侧需要先有 Linux 发行版。本项目默认发行版基线是 `Ubuntu-24.04`，可通过参数改成其他发行版：
+
+```powershell
+.\windows\wsl-distro.ps1 -Install -Distro Ubuntu-24.04 -SetDefault
+```
+
+首次安装后需要启动该发行版一次，创建 Linux 用户。之后进入 WSL，在仓库目录下执行：
 
 ```bash
 bash wsl/validate.sh
@@ -94,6 +101,7 @@ Docker Engine 安装到 WSL：
 
 - 默认层保持小，只包含 `core` 和 `agentic-dev`。
 - Windows 侧 `agentic-dev` 只保留入口工具；Docker、Node.js、K8s CLI 和主力 CLI 工具链优先放在 WSL。
+- WSL 侧脚本必须在已安装的 Linux 发行版中执行，默认发行版基线为 `Ubuntu-24.04`。
 - Python Install Manager 只用于 Windows 原生 Python 需求，主项目 Python 优先放在 WSL。
 - `all` 不是完整个人环境，只是宽松集合；敏感、强设备角色、大体积或维护类 profile 必须显式安装。
 - 同一应用只保留一个主来源。
