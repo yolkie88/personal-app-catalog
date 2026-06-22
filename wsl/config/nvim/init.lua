@@ -132,7 +132,14 @@ require("lazy").setup({
       end
   end },
 
-  -- Formatting.
+  -- Formatting. mason-tool-installer fetches the formatter binaries so the
+  -- conform entries below are actually available (independent of the host toolchain).
+  { "WhoIsSethDaniel/mason-tool-installer.nvim", dependencies = { "williamboman/mason.nvim" },
+    config = function()
+      require("mason-tool-installer").setup({
+        ensure_installed = { "stylua", "prettier", "ruff", "black", "shfmt" },
+      })
+  end },
   { "stevearc/conform.nvim", config = function()
       require("conform").setup({
         formatters_by_ft = {
@@ -142,6 +149,8 @@ require("lazy").setup({
           typescript = { "prettier" },
           json = { "prettier" },
           yaml = { "prettier" },
+          sh = { "shfmt" },
+          bash = { "shfmt" },
         },
       })
       vim.keymap.set("n", "<leader>f", function()

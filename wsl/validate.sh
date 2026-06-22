@@ -65,6 +65,7 @@ test_required_files() {
     "${SCRIPT_DIR}/config/tmux/tmux.conf"
     "${SCRIPT_DIR}/config/bat/config"
     "${SCRIPT_DIR}/config/lazygit/config.yml"
+    "${SCRIPT_DIR}/config/lazygit/config.delta.yml"
     "${SCRIPT_DIR}/config/git/gitconfig.shared"
     "${SCRIPT_DIR}/config/git/gitconfig.delta"
     "${SCRIPT_DIR}/config/bash/aliases.sh"

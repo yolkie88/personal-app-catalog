@@ -335,7 +335,15 @@ install_configs() {
   backup_then_copy "${CONFIG_DIR}/starship/starship.toml" "${HOME}/.config/starship.toml"
   backup_then_copy "${CONFIG_DIR}/tmux/tmux.conf"       "${HOME}/.tmux.conf"
   backup_then_copy "${CONFIG_DIR}/bat/config"           "${HOME}/.config/bat/config"
-  backup_then_copy "${CONFIG_DIR}/lazygit/config.yml"   "${HOME}/.config/lazygit/config.yml"
+
+  # lazygit: use the delta-enabled config only when delta is installed, otherwise the
+  # dependency-free base config (its pager would point at a missing command otherwise).
+  local lazygit_src="${CONFIG_DIR}/lazygit/config.yml"
+  if command -v delta >/dev/null 2>&1; then
+    lazygit_src="${CONFIG_DIR}/lazygit/config.delta.yml"
+  fi
+  backup_then_copy "$lazygit_src" "${HOME}/.config/lazygit/config.yml"
+
   backup_then_copy "${CONFIG_DIR}/bash/aliases.sh"      "${HOME}/.config/personal-app-catalog/aliases.sh"
 
   # Git: reference the shared config from the global config; identity stays manual.
