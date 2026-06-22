@@ -358,7 +358,10 @@ function Test-RequiredFiles {
         "windows/config/terminal/settings.defaults.json",
         "windows/config/git/gitconfig.shared",
         "windows/config/git/gitconfig.delta",
+        "windows/config/vscode/extensions.txt",
+        "windows/config/vscode/settings.json",
         "windows/docs/config.md",
+        "docs/agent-workflows.md",
         "wsl/bootstrap.sh",
         "wsl/validate.sh",
         "wsl/packages/apt-base.txt",
@@ -400,16 +403,23 @@ function Test-ConfigTemplates {
         return
     }
 
-    # PowerShell modules list is a plain list file (no mise selector).
+    # List files (no mise selector).
     $null = Test-ListFile -Path (Join-Path $configDir "pwsh/modules.txt") -Name "windows/config/pwsh/modules.txt"
+    $null = Test-ListFile -Path (Join-Path $configDir "vscode/extensions.txt") -Name "windows/config/vscode/extensions.txt"
 
-    # Windows Terminal defaults must be valid JSON for the merge step.
-    $terminalDefaults = Join-Path $configDir "terminal/settings.defaults.json"
-    if (Test-Path $terminalDefaults) {
-        try {
-            Get-Content -Path $terminalDefaults -Raw | ConvertFrom-Json | Out-Null
-        } catch {
-            Add-Failure "Invalid JSON: windows/config/terminal/settings.defaults.json"
+    # JSON templates must parse for their merge steps.
+    $jsonTemplates = @(
+        "terminal/settings.defaults.json",
+        "vscode/settings.json"
+    )
+    foreach ($rel in $jsonTemplates) {
+        $path = Join-Path $configDir $rel
+        if (Test-Path $path) {
+            try {
+                Get-Content -Path $path -Raw | ConvertFrom-Json | Out-Null
+            } catch {
+                Add-Failure "Invalid JSON: windows/config/$rel"
+            }
         }
     }
 

@@ -14,6 +14,7 @@
 .\windows\configure.ps1 -Pwsh           # 仅 PowerShell
 .\windows\configure.ps1 -Terminal       # 仅 Windows Terminal
 .\windows\configure.ps1 -Git            # 仅 Git 共享配置
+.\windows\configure.ps1 -VSCode         # 仅 VS Code 扩展与设置
 ```
 
 行为：
@@ -32,6 +33,8 @@
 | `config/terminal/settings.defaults.json` | Windows Terminal `settings.json`（深合并） | 默认字体、配色、padding 等 defaults |
 | `config/git/gitconfig.shared` | `~\catalog.gitconfig`（通过 `include.path` 引入） | 常用 alias、合理默认值（merge/diff/pull/push/init/rebase；不含身份，无外部依赖） |
 | `config/git/gitconfig.delta` | `~\catalog-delta.gitconfig`（仅在检测到 delta 时通过 `include.path` 引入） | delta pager 与 diff filter 设置 |
+| `config/vscode/extensions.txt` | `code --install-extension`（逐个，已装则跳过） | 推荐扩展清单：WSL Remote、Docker、K8s、Python、TS/Vue、Java、YAML、Markdown、GitLens、GitHub Actions、REST Client |
+| `config/vscode/settings.json` | VS Code 用户 `settings.json`（深合并） | formatOnSave、各语言默认 formatter、关闭遥测等（不含账号/Sync 密钥/token） |
 
 ## 依赖闭环
 
@@ -46,4 +49,4 @@
 - 模板不含身份、凭据、密钥或 token；`windows/validate.ps1` 会扫描 `windows/config/` 拦截 secret 赋值和 email。
 - Git 身份仍写在你自己的全局配置；本层只通过 `include.path` 叠加共享配置。
 - 配置层不是 winget profile，不进入 `bootstrap.ps1` 的 `ValidateSet`、`all` 集合或 `catalog.md` 的 profile 表。
-- VS Code 配置不在本层管理，使用 VS Code 自带 Settings Sync。
+- VS Code 配置层是可选的（`configure.ps1 -VSCode`）：只管理推荐扩展和脱敏 settings 默认值，深合并保留你已有的 key。**不管理**账号登录、Settings Sync 密钥、私有扩展源——这些仍走 VS Code 自带 Settings Sync 或手工恢复。

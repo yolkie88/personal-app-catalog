@@ -3,6 +3,7 @@ param(
     [switch] $Pwsh,
     [switch] $Terminal,
     [switch] $Git,
+    [switch] $VSCode,
     [switch] $All,
     [switch] $Plan
 )
@@ -14,11 +15,12 @@ $ConfigDir = Join-Path $ScriptRootPath "config"
 $Marker = "# personal-app-catalog"
 
 function Show-Usage {
-    Write-Host "Usage: .\windows\configure.ps1 [-Pwsh] [-Terminal] [-Git] [-All] [-Plan]"
+    Write-Host "Usage: .\windows\configure.ps1 [-Pwsh] [-Terminal] [-Git] [-VSCode] [-All] [-Plan]"
     Write-Host ""
     Write-Host "  -Pwsh      Install PowerShell modules and a managed profile"
     Write-Host "  -Terminal  Merge Windows Terminal defaults (font, color scheme)"
     Write-Host "  -Git       Reference the shared Git config via include.path"
+    Write-Host "  -VSCode    Install recommended extensions and merge user settings"
     Write-Host "  -All       Apply all of the above"
     Write-Host "  -Plan      Print what would change without writing anything"
     Write-Host ""
@@ -256,6 +258,69 @@ function Invoke-GitConfig {
     }
 }
 
+function Get-VSCodeSettingsPath {
+    $appData = $env:APPDATA
+    if ([string]::IsNullOrWhiteSpace($appData)) {
+        return $null
+    }
+    return (Join-Path $appData "Code\User\settings.json")
+}
+
+function Invoke-VSCodeConfig {
+    Write-Host "==> VS Code extensions and settings"
+
+    $extensions = @(Get-ListItems -Path (Join-Path $ConfigDir "vscode/extensions.txt"))
+
+    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
+        Write-Host "    [skip] 'code' CLI not found; skipping extension install."
+    } elseif ($Plan.IsPresent) {
+        Write-Host "    [plan] install $($extensions.Count) extension(s) from extensions.txt (skipping already-installed)"
+    } else {
+        $installed = @()
+        try { $installed = @(& code --list-extensions 2>$null) } catch { $installed = @() }
+        foreach ($ext in $extensions) {
+            if ($installed -contains $ext) {
+                Write-Host "    extension present: $ext"
+                continue
+            }
+            Write-Host "    installing extension: $ext"
+            & code --install-extension $ext --force | Out-Null
+        }
+    }
+
+    # Settings: deep-merge our defaults, preserving any existing user keys.
+    $settingsPath = Get-VSCodeSettingsPath
+    if (-not $settingsPath) {
+        Write-Host "    [skip] VS Code user settings path not available."
+        return
+    }
+
+    $defaultsPath = Join-Path $ConfigDir "vscode/settings.json"
+    $overlay = Get-Content -Path $defaultsPath -Raw | ConvertFrom-Json
+
+    if ($Plan.IsPresent) {
+        Write-Host "    [plan] merge $defaultsPath into $settingsPath"
+        return
+    }
+
+    if (-not (Test-Path $settingsPath)) {
+        Backup-File -Path $settingsPath
+        $parent = Split-Path -Parent $settingsPath
+        if ($parent -and -not (Test-Path $parent)) {
+            New-Item -ItemType Directory -Force -Path $parent | Out-Null
+        }
+        ConvertTo-Json -InputObject $overlay -Depth 32 | Out-File -FilePath $settingsPath -Encoding utf8
+        Write-Host "    wrote $settingsPath"
+        return
+    }
+
+    Backup-File -Path $settingsPath
+    $current = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
+    Merge-Object -Base $current -Overlay $overlay
+    ConvertTo-Json -InputObject $current -Depth 32 | Out-File -FilePath $settingsPath -Encoding utf8
+    Write-Host "    merged VS Code settings into $settingsPath"
+}
+
 function Write-DependencyHint {
     $optional = @("delta", "fzf", "starship", "lazygit", "bat")
     $missing = @($optional | Where-Object { -not (Get-Command $_ -ErrorAction SilentlyContinue) })
@@ -265,7 +330,7 @@ function Write-DependencyHint {
     }
 }
 
-if (-not ($Pwsh -or $Terminal -or $Git -or $All)) {
+if (-not ($Pwsh -or $Terminal -or $Git -or $VSCode -or $All)) {
     Show-Usage
     exit 1
 }
@@ -277,6 +342,7 @@ if ($Plan.IsPresent) {
 if ($All -or $Pwsh)     { Invoke-PwshConfig }
 if ($All -or $Terminal) { Invoke-TerminalConfig }
 if ($All -or $Git)      { Invoke-GitConfig }
+if ($All -or $VSCode)   { Invoke-VSCodeConfig }
 
 Write-DependencyHint
 
