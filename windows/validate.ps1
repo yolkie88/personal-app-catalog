@@ -222,39 +222,33 @@ function Get-AllSetFromCatalog {
     $lines = Get-Content -Path $CatalogPath
     $set = New-Object System.Collections.Generic.List[string]
     $inAllSection = $false
-    $inIncludeBlock = $false
+    $collectingBullets = $false
 
     foreach ($line in $lines) {
         if (-not $inAllSection) {
-            if ($line.Contains("##") -and $line.Contains("all") -and $line.Contains("boundary")) {
-                $inAllSection = $true
-            }
-            if ($line.Contains("##") -and $line.Contains("all") -and $line.Contains("边界")) {
+            $tokens = @(Get-MarkdownCodeTokensFromLine -Line $line)
+            if ($line.TrimStart().StartsWith("##") -and ($tokens -contains "all")) {
                 $inAllSection = $true
             }
             continue
         }
 
-        if (-not $inIncludeBlock) {
-            if ($line.Contains("includes")) {
-                $inIncludeBlock = $true
-            }
-            if ($line.Contains("只包含")) {
-                $inIncludeBlock = $true
-            }
-            continue
-        }
-
-        if ($line.Contains("excludes") -or $line.Contains("不包含")) {
+        if ($line.TrimStart().StartsWith("##")) {
             break
         }
 
         if ($line.TrimStart().StartsWith("- ")) {
+            $collectingBullets = $true
             foreach ($token in Get-MarkdownCodeTokensFromLine -Line $line) {
                 if ($token -match '^[a-z0-9][a-z0-9-]*$') {
                     $set.Add($token) | Out-Null
                 }
             }
+            continue
+        }
+
+        if ($collectingBullets -and $line.Trim().Length -gt 0) {
+            break
         }
     }
 
