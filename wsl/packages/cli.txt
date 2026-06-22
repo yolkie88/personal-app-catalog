@@ -1,6 +1,8 @@
-# WSL-first CLI toolchain. mise installs and pins these versions; bootstrap.sh
-# reads this file directly, so it is the single source of truth. mise itself is
-# bootstrapped separately and is not listed here.
+# WSL-first CLI toolchain. mise manages these tools.
+# bootstrap.sh reads this file directly, so it is the single source of truth.
+# Entries using @latest or @lts are intentionally floating; use exact versions
+# when reproducibility matters more than freshness.
+# mise itself is bootstrapped separately and is not listed here.
 
 node@lts
 python@latest
