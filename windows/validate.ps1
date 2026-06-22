@@ -352,6 +352,12 @@ function Test-Gitignore {
 function Test-RequiredFiles {
     $required = @(
         "windows/wsl-distro.ps1",
+        "windows/configure.ps1",
+        "windows/config/pwsh/profile.ps1",
+        "windows/config/pwsh/modules.txt",
+        "windows/config/terminal/settings.defaults.json",
+        "windows/config/git/gitconfig.shared",
+        "windows/docs/config.md",
         "wsl/bootstrap.sh",
         "wsl/validate.sh",
         "wsl/packages/apt-base.txt",
@@ -360,7 +366,8 @@ function Test-RequiredFiles {
         "wsl/packages/docker.txt",
         "wsl/docs/wsl.md",
         "wsl/docs/tools.md",
-        "wsl/docs/wsl-boundaries.md"
+        "wsl/docs/wsl-boundaries.md",
+        "wsl/docs/config.md"
     )
 
     foreach ($relative in $required) {
@@ -381,6 +388,40 @@ function Test-WslPackageLists {
     foreach ($package in $requiredDockerPackages) {
         if ($docker -notcontains $package) {
             Add-Failure "wsl/packages/docker.txt missing required Docker package: $package"
+        }
+    }
+}
+
+function Test-ConfigTemplates {
+    $configDir = Join-Path $ScriptRootPath "config"
+    if (-not (Test-Path $configDir)) {
+        Add-Failure "Missing windows/config templates directory."
+        return
+    }
+
+    # PowerShell modules list is a plain list file (no mise selector).
+    $null = Test-ListFile -Path (Join-Path $configDir "pwsh/modules.txt") -Name "windows/config/pwsh/modules.txt"
+
+    # Windows Terminal defaults must be valid JSON for the merge step.
+    $terminalDefaults = Join-Path $configDir "terminal/settings.defaults.json"
+    if (Test-Path $terminalDefaults) {
+        try {
+            Get-Content -Path $terminalDefaults -Raw | ConvertFrom-Json | Out-Null
+        } catch {
+            Add-Failure "Invalid JSON: windows/config/terminal/settings.defaults.json"
+        }
+    }
+
+    # Config templates are tracked but must stay sanitized: no keys, credentials, or
+    # real email identity. Identity and secrets are recovered manually per the docs.
+    foreach ($file in Get-ChildItem -Path $configDir -Recurse -File) {
+        $content = Get-Content -Path $file.FullName -Raw
+        if (($content -match 'BEGIN [A-Z ]*PRIVATE KEY') -or
+            ($content -match '(?i)(password|secret|api[_-]?key|token)\s*[:=]')) {
+            Add-Failure "Config template $($file.Name) contains a secret-like assignment."
+        }
+        if ($content -match '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}') {
+            Add-Failure "Config template $($file.Name) contains an email-like identity string."
         }
     }
 }
@@ -418,6 +459,7 @@ Test-AllProfileSet
 Test-ScoopList
 Test-Gitignore
 Test-RequiredFiles
+Test-ConfigTemplates
 Test-WslPackageLists
 Test-WslFirstBoundaries
 

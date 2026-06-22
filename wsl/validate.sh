@@ -59,6 +59,14 @@ test_required_files() {
     "${SCRIPT_DIR}/docs/wsl.md"
     "${SCRIPT_DIR}/docs/tools.md"
     "${SCRIPT_DIR}/docs/wsl-boundaries.md"
+    "${SCRIPT_DIR}/docs/config.md"
+    "${SCRIPT_DIR}/config/nvim/init.lua"
+    "${SCRIPT_DIR}/config/starship/starship.toml"
+    "${SCRIPT_DIR}/config/tmux/tmux.conf"
+    "${SCRIPT_DIR}/config/bat/config"
+    "${SCRIPT_DIR}/config/lazygit/config.yml"
+    "${SCRIPT_DIR}/config/git/gitconfig.shared"
+    "${SCRIPT_DIR}/config/bash/aliases.sh"
   )
 
   local file
@@ -92,6 +100,27 @@ test_docker_list() {
   done
 }
 
+test_config_templates() {
+  local config_dir="${SCRIPT_DIR}/config"
+  if [[ ! -d "$config_dir" ]]; then
+    add_failure "Missing wsl/config templates directory."
+    return
+  fi
+
+  # Config templates are tracked but must stay sanitized: no keys, credentials, or
+  # real email identity. Identity and secrets are recovered manually per the boundary docs.
+  local file
+  while IFS= read -r -d '' file; do
+    if grep -qE 'BEGIN [A-Z ]*PRIVATE KEY' "$file" ||
+       grep -qiE '(password|secret|api[_-]?key|token)[[:space:]]*[:=]' "$file"; then
+      add_failure "Config template ${file#"${REPO_ROOT}/"} contains a secret-like assignment."
+    fi
+    if grep -qE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' "$file"; then
+      add_failure "Config template ${file#"${REPO_ROOT}/"} contains an email-like identity string."
+    fi
+  done < <(find "$config_dir" -type f -print0)
+}
+
 test_wsl_first_boundaries() {
   local agentic_manifest="${REPO_ROOT}/windows/manifests/winget-agentic-dev.json"
   if [[ ! -f "$agentic_manifest" ]]; then
@@ -112,6 +141,7 @@ test_shell_syntax() {
 test_required_files
 test_package_lists
 test_docker_list
+test_config_templates
 test_wsl_first_boundaries
 test_shell_syntax
 

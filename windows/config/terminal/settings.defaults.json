@@ -1,0 +1,18 @@
+{
+  "_comment": "Managed by personal-app-catalog. Sanitized template only - no secrets, no identity. configure.ps1 -Terminal deep-merges this into Windows Terminal settings.json (existing profiles preserved).",
+  "copyOnSelect": true,
+  "copyFormatting": "none",
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "Cascadia Code",
+        "size": 11
+      },
+      "colorScheme": "One Half Dark",
+      "opacity": 95,
+      "useAcrylic": false,
+      "padding": "8",
+      "scrollbarState": "hidden"
+    }
+  }
+}

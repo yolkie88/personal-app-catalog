@@ -3,11 +3,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGES_DIR="${SCRIPT_DIR}/packages"
+CONFIG_DIR="${SCRIPT_DIR}/config"
 
 INSTALL_BASE=false
 INSTALL_CLI=false
 INSTALL_K8S=false
 INSTALL_DOCKER=false
+INSTALL_CONFIG=false
 PLAN=false
 
 usage() {
@@ -19,13 +21,18 @@ Options:
   --cli       Install WSL-first developer CLI tools through mise where possible
   --k8s       Install Kubernetes / K3s CLI tools through mise where possible
   --docker    Install Docker Engine inside WSL
-  --all       Install base + cli + k8s + docker
+  --config    Apply tool config templates (nvim, starship, tmux, bat, lazygit, git, bash aliases)
+  --all       Install base + cli + k8s + docker + config
   --plan      Print what would run without installing
   -h, --help  Show help
 
 Recommended first run:
   ./wsl/bootstrap.sh --base --cli --k8s --plan
   ./wsl/bootstrap.sh --base --cli --k8s
+
+Apply optimized tool configs (backs up existing files first):
+  ./wsl/bootstrap.sh --config --plan
+  ./wsl/bootstrap.sh --config
 
 Docker-in-WSL run:
   ./wsl/bootstrap.sh --docker
@@ -38,11 +45,13 @@ while [[ $# -gt 0 ]]; do
     --cli) INSTALL_CLI=true ;;
     --k8s) INSTALL_K8S=true ;;
     --docker) INSTALL_DOCKER=true ;;
+    --config) INSTALL_CONFIG=true ;;
     --all)
       INSTALL_BASE=true
       INSTALL_CLI=true
       INSTALL_K8S=true
       INSTALL_DOCKER=true
+      INSTALL_CONFIG=true
       ;;
     --plan) PLAN=true ;;
     -h|--help)
@@ -58,7 +67,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-if [[ "$INSTALL_BASE" == false && "$INSTALL_CLI" == false && "$INSTALL_K8S" == false && "$INSTALL_DOCKER" == false ]]; then
+if [[ "$INSTALL_BASE" == false && "$INSTALL_CLI" == false && "$INSTALL_K8S" == false && "$INSTALL_DOCKER" == false && "$INSTALL_CONFIG" == false ]]; then
   usage
   exit 1
 fi
@@ -267,6 +276,85 @@ install_docker_engine() {
   echo "==> Docker installed. Restart this WSL session before using docker without sudo."
 }
 
+ensure_alias_sourcing() {
+  local rc="${HOME}/.bashrc"
+  local aliases_file="${HOME}/.config/personal-app-catalog/aliases.sh"
+  if [[ "$PLAN" == true ]]; then
+    echo "[plan] ensure aliases source block in ${rc}"
+    return
+  fi
+  if [[ -f "$rc" ]] && grep -qF 'personal-app-catalog aliases' "$rc"; then
+    return
+  fi
+  cat >> "$rc" <<RC
+
+# personal-app-catalog aliases (guarded so it no-ops until the file exists)
+[[ -f "${aliases_file}" ]] && source "${aliases_file}"
+RC
+  echo "==> Added aliases source block to ${rc}."
+}
+
+backup_then_copy() {
+  local src="$1"
+  local dst="$2"
+
+  if [[ ! -f "$src" ]]; then
+    echo "  [skip] template not found: ${src#"${SCRIPT_DIR}/"}" >&2
+    return
+  fi
+
+  if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+    echo "  unchanged: ${dst}"
+    return
+  fi
+
+  if [[ "$PLAN" == true ]]; then
+    if [[ -f "$dst" ]]; then
+      echo "  [plan] backup ${dst} then copy ${src#"${SCRIPT_DIR}/"}"
+    else
+      echo "  [plan] copy ${src#"${SCRIPT_DIR}/"} -> ${dst}"
+    fi
+    return
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+  if [[ -f "$dst" ]]; then
+    local backup
+    backup="${dst}.bak.$(date +%Y%m%d-%H%M%S)"
+    mv "$dst" "$backup"
+    echo "  backed up ${dst} -> ${backup}"
+  fi
+  cp "$src" "$dst"
+  echo "  wrote ${dst}"
+}
+
+install_configs() {
+  echo "==> Tool config templates"
+
+  backup_then_copy "${CONFIG_DIR}/nvim/init.lua"        "${HOME}/.config/nvim/init.lua"
+  backup_then_copy "${CONFIG_DIR}/starship/starship.toml" "${HOME}/.config/starship.toml"
+  backup_then_copy "${CONFIG_DIR}/tmux/tmux.conf"       "${HOME}/.tmux.conf"
+  backup_then_copy "${CONFIG_DIR}/bat/config"           "${HOME}/.config/bat/config"
+  backup_then_copy "${CONFIG_DIR}/lazygit/config.yml"   "${HOME}/.config/lazygit/config.yml"
+  backup_then_copy "${CONFIG_DIR}/bash/aliases.sh"      "${HOME}/.config/personal-app-catalog/aliases.sh"
+
+  # Git: reference the shared config from the global config; identity stays manual.
+  local git_shared="${HOME}/.config/git/catalog.gitconfig"
+  backup_then_copy "${CONFIG_DIR}/git/gitconfig.shared" "$git_shared"
+  if command -v git >/dev/null 2>&1; then
+    if [[ "$PLAN" == true ]]; then
+      echo "  [plan] git config --global include.path ${git_shared}"
+    elif git config --global --get-all include.path 2>/dev/null | grep -qxF "$git_shared"; then
+      echo "  include.path already references ${git_shared}"
+    else
+      git config --global --add include.path "$git_shared"
+      echo "  added include.path -> ${git_shared}"
+    fi
+  fi
+
+  ensure_alias_sourcing
+}
+
 if [[ "$INSTALL_BASE" == true ]]; then
   install_apt_base
 fi
@@ -281,6 +369,10 @@ fi
 
 if [[ "$INSTALL_DOCKER" == true ]]; then
   install_docker_engine
+fi
+
+if [[ "$INSTALL_CONFIG" == true ]]; then
+  install_configs
 fi
 
 if [[ "$INSTALL_BASE" == true || "$INSTALL_CLI" == true ]]; then

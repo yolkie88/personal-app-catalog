@@ -1,0 +1,10 @@
+# Managed by personal-app-catalog. Sanitized template only — no secrets, no identity.
+# Copied to ~/.config/bat/config by `wsl/bootstrap.sh --config`.
+
+--theme="Monokai Extended"
+--style="numbers,changes,header"
+--italic-text=always
+
+# Treat a few common config files with sensible syntax highlighting.
+--map-syntax="*.conf:INI"
+--map-syntax=".gitconfig.shared:Git Config"

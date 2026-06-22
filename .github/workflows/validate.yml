@@ -15,6 +15,10 @@ jobs:
         shell: pwsh
         run: ./windows/validate.ps1
 
+      - name: Validate configure dry-run
+        shell: pwsh
+        run: ./windows/configure.ps1 -All -Plan
+
       - name: Validate WSL distro script
         shell: pwsh
         run: ./windows/wsl-distro.ps1 -Plan

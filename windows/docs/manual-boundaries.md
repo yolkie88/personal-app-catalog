@@ -14,6 +14,12 @@
 | 游戏本体、存档、Mod | 不入库 |
 | 授权风险工具 | 不入库 |
 
+## 配置层
+
+`windows/config/` 下的工具配置模板（PowerShell profile/模块、Windows Terminal defaults、Git 共享配置）是脱敏模板，由 `.\windows\configure.ps1` 应用，覆盖前先备份。详见 `config.md`。
+
+Git 身份（`user.name` / `user.email`）、SSH/GPG、各类账号登录、PowerShell 历史等仍按本文件其余部分手工恢复，不进入仓库。
+
 ## 代理核心
 
 `proxy-core` 只安装 Mihomo、sing-box 和 WinSW。真实配置按设备维护，倾向以系统服务运行，并按设备开启 TUN。

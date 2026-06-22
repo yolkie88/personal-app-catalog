@@ -20,6 +20,12 @@ Manifests are the single source of truth and the scripts only read them — neve
 - **WSL package lists** live in `wsl/packages/` and `wsl/bootstrap.sh` reads them directly: `apt-base.txt` (apt package names), `cli.txt` and `k8s.txt` (mise tool selectors, each requiring an `@` version like `@latest`/`@lts`/exact), `docker.txt` (apt packages for Docker Engine).
 - **WSL-first boundary** is an enforced invariant: Docker, Node.js, Kubernetes CLIs, and the main developer CLI toolchain belong in WSL, not Windows. `Docker.DockerDesktop`, `OpenJS.NodeJS.LTS`, and `OpenAI.Codex` are explicitly forbidden from the Windows manifests by validation.
 
+### The config (tool-optimization) layer
+
+Separate from the *package* manifests, sanitized tool-config templates live in `windows/config/` and `wsl/config/` (PowerShell profile + modules, Windows Terminal defaults, shared Git config, Neovim/lazy.nvim, starship, tmux, bat, lazygit, bash aliases). They are applied **opt-in** and **plan-first** by `windows/configure.ps1` (`-Pwsh`/`-Terminal`/`-Git`/`-All`, `-Plan`) and `wsl/bootstrap.sh --config`, both of which **back up any existing target before overwriting** and are idempotent (guarded `$PROFILE`/`.bashrc` insertion via a `personal-app-catalog` marker; Git config layered via `include.path`).
+
+Key rules: the config layer is **not** a winget profile — never add it to `bootstrap.ps1`'s `ValidateSet`, the `all` set, or the `catalog.md` profile tables. Templates must stay **template-only**: no identity (`user.name`/`user.email`), keys, credentials, tokens, or history — both validators scan `*/config/` and fail on secret-like assignments or email strings. `windows/configure.ps1 -Plan` must remain side-effect-free (no external commands) so CI can run it on Linux `pwsh`. See `windows/docs/config.md` and `wsl/docs/config.md`.
+
 ### The validation contract (most important thing to preserve)
 
 `windows/validate.ps1` enforces cross-file consistency, so a change in one place usually requires matching edits elsewhere or validation fails. When adding/renaming/removing a profile or package, keep these in sync:
@@ -29,7 +35,8 @@ Manifests are the single source of truth and the scripts only read them — neve
 - The `all` set in `bootstrap.ps1` must exactly match the `all` section listed in `windows/docs/catalog.md`.
 - No duplicate package across winget manifests; no duplicate Microsoft Store ID; Store IDs must be alphanumeric.
 - `cli.txt` / `k8s.txt` entries must carry a mise `@` selector; `docker.txt` must contain the five required Docker packages (`docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`, `docker-compose-plugin`).
-- `.gitignore` must keep the secret/export patterns; required WSL files must exist.
+- `.gitignore` must keep the secret/export patterns; required Windows/WSL files (now including `windows/configure.ps1`, the `windows/config/`+`wsl/config/` templates, and the two `config.md` docs) must exist.
+- Config templates under `windows/config/` and `wsl/config/` are secret-scanned — no key/credential/token assignments or email identity strings.
 
 `wsl/validate.sh` re-checks the WSL-side invariants (package lists, Docker packages, WSL-first boundary) and runs `bash -n` syntax checks.
 
@@ -61,6 +68,15 @@ WSL install (must run inside an installed Linux distro; default baseline `Ubuntu
 ./wsl/bootstrap.sh --base --cli --k8s --plan   # preview
 ./wsl/bootstrap.sh --base --cli --k8s          # apply
 ./wsl/bootstrap.sh --docker                    # Docker Engine in WSL (Ubuntu/Debian only)
+./wsl/bootstrap.sh --config --plan             # preview tool-config templates (backs up existing files)
+./wsl/bootstrap.sh --config                    # apply tool-config templates
+```
+
+Tool-config layer (opt-in, plan-first, backs up before overwriting):
+
+```powershell
+.\windows\configure.ps1 -All -Plan            # preview PowerShell/Terminal/Git config
+.\windows\configure.ps1 -All                  # apply (or -Pwsh / -Terminal / -Git individually)
 ```
 
 Distro management, updates, and snapshots:

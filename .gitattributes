@@ -2,3 +2,4 @@
 # LF on every platform so a Windows checkout (CRLF) cannot break them.
 *.sh text eol=lf
 wsl/packages/*.txt text eol=lf
+wsl/config/** text eol=lf

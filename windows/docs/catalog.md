@@ -69,6 +69,12 @@ WSL 不通过 winget manifest 管理。相关文件位于 `../../wsl/`：
 - `../../wsl/docs/tools.md`：WSL 工具用途、常用方式和恢复边界；
 - `../../wsl/docs/wsl-boundaries.md`：WSL 敏感配置和数据边界。
 
+## 配置层
+
+工具优化配置（PowerShell profile/模块、Windows Terminal defaults、Git 共享配置，以及 WSL 侧 nvim/starship/tmux/bat/lazygit/git/bash 别名）不是 winget profile，不进入上面的 profile 表，也不进入 `bootstrap.ps1` 的 ValidateSet 或 `all` 集合。
+
+这些是脱敏模板，由 `windows/configure.ps1`（Windows）和 `wsl/bootstrap.sh --config`（WSL）应用，覆盖前先备份。详见 `windows/docs/config.md` 和 `../../wsl/docs/config.md`。
+
 ## `all` 边界
 
 `all` 只包含：
