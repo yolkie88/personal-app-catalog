@@ -31,7 +31,7 @@
 | `config/lazygit/config.delta.yml` | `~/.config/lazygit/config.yml`（仅在检测到 delta 时使用） | 在基础版之上启用 delta pager |
 | `config/git/gitconfig.shared` | `~/.config/git/catalog.gitconfig` | 通过 `include.path` 引入的共享 Git 配置：常用 alias、合理默认值（不含身份，无外部依赖） |
 | `config/git/gitconfig.delta` | `~/.config/git/catalog-delta.gitconfig` | delta pager 设置，仅在检测到 `delta` 时才通过 `include.path` 引入 |
-| `config/bash/aliases.sh` | `~/.config/personal-app-catalog/aliases.sh` | 常用 alias（`ll`、`gs`、`lg` 等），从 `.bashrc` guarded 块 source |
+| `config/bash/aliases.sh` | `~/.config/personal-app-catalog/aliases.sh` | 常用 alias（`ll`、`gs`、`lg` 等）、当前 shell 代理开关，从 `.bashrc` guarded 块 source |
 
 ## Neovim 插件与依赖
 
@@ -43,6 +43,20 @@ formatter 本体（stylua、prettier、ruff、black、shfmt）由 `mason-tool-in
 
 **剪贴板桥接**：`clipboard=unnamedplus` 在 WSL 里要与 Windows 剪贴板互通，需要 `win32yank.exe` 在 PATH 上。`init.lua` 检测到它时会自动配置 `vim.g.clipboard`；没有则保持默认。`win32yank` 是 Windows 侧辅助工具，不由本脚本自动安装（可从其 release 下载放入 PATH）。
 
+## 代理
+
+WSL 代理策略见 `wsl/docs/proxy.md`。本项目推荐 Windows mihomo 作为代理入口，WSL 使用 mirrored networking、autoProxy 和显式环境变量。
+
+`config/bash/aliases.sh` 提供当前 shell 的代理开关：
+
+```bash
+proxy_on
+proxy_status
+proxy_off
+```
+
+这些函数只影响当前 shell 和子进程，不持久化到 Git / npm / pip / Docker daemon。Docker daemon 代理、SSH 代理和工具级持久配置按 `wsl/docs/proxy.md` 手工处理。
+
 ## 依赖闭环与执行顺序
 
 - **delta**：Git 的 pager 配置拆到独立的 `gitconfig.delta`，`--config` 只在检测到 `delta` 时才引入它；lazygit 也同理——检测到 delta 用 `config.delta.yml`，否则用无依赖的 `config.yml`。两者都不会因为缺 delta 而报错。
@@ -53,4 +67,5 @@ formatter 本体（stylua、prettier、ruff、black、shfmt）由 `mason-tool-in
 
 - 模板不含身份、凭据、密钥、token 或个人历史；`wsl/validate.sh` 会扫描 `wsl/config/` 拦截 secret 赋值和 email。
 - Git 身份仍写在你自己的 `~/.gitconfig`；本层只通过 `include.path` 叠加共享配置。
+- 代理函数只提供本机默认地址和临时环境变量开关；mihomo 订阅、节点、secret、日志和缓存不入库。
 - neovim 插件锁文件（`lazy-lock.json`）、zoxide 历史、tmux session、shell 历史等运行期状态按设备生成，不入库。
