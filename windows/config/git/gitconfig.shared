@@ -1,0 +1,42 @@
+# Managed by personal-app-catalog. Sanitized template only - no identity, no credentials.
+# Referenced from the global Git config via include.path; your ~/.gitconfig keeps
+# user.name / user.email / signing settings. Applied by `windows/configure.ps1 -Git`.
+# delta-specific settings live in gitconfig.delta, included only when delta is installed.
+
+[core]
+	autocrlf = true
+
+[merge]
+	conflictstyle = zdiff3
+
+[diff]
+	colorMoved = default
+	algorithm = histogram
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+
+[fetch]
+	prune = true
+
+[push]
+	autoSetupRemote = true
+
+[rebase]
+	autosquash = true
+
+[column]
+	ui = auto
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	ci = commit
+	lg = log --oneline --graph --decorate -20
+	last = log -1 HEAD --stat
+	unstage = reset HEAD --
+	amend = commit --amend --no-edit

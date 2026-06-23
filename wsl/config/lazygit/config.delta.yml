@@ -1,0 +1,23 @@
+# Managed by personal-app-catalog. Sanitized template only — no secrets, no identity.
+# delta-enabled variant. Copied to ~/.config/lazygit/config.yml by `wsl/bootstrap.sh --config`
+# only when delta is installed; otherwise the dependency-free config.yml is used instead.
+# Docs: https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+
+gui:
+  nerdFontsVersion: "3"
+  showFileTree: true
+  showRandomTip: false
+  scrollHeight: 4
+  sidePanelWidth: 0.3333
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  commit:
+    signOff: false
+  autoFetch: true
+update:
+  method: never
+keybinding:
+  universal:
+    quit: q

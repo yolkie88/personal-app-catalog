@@ -75,6 +75,20 @@ Docker Engine 安装到 WSL：
 .\windows\bootstrap.ps1 -Profile daily,network,automation,dev-extra -WithScoop -Plan -Report
 ```
 
+应用工具优化配置（PowerShell、Windows Terminal、Git 共享配置；覆盖前先备份）：
+
+```powershell
+.\windows\configure.ps1 -All -Plan
+.\windows\configure.ps1 -All
+```
+
+WSL 侧应用工具优化配置（nvim、starship、tmux、bat、lazygit、git、bash 别名）：
+
+```bash
+./wsl/bootstrap.sh --config --plan
+./wsl/bootstrap.sh --config
+```
+
 更新和快照：
 
 ```powershell
@@ -93,7 +107,9 @@ Docker Engine 安装到 WSL：
 | `windows/docs/manual-boundaries.md` | 敏感、授权、硬件、代理、远控等手工边界 |
 | `windows/docs/operations.md` | Windows 安装、更新、维护流程 |
 | `windows/docs/recovery-playbook.md` | 新设备恢复顺序和人工边界 |
+| `windows/docs/config.md` | Windows 工具配置层（PowerShell、Terminal、Git）和 `configure.ps1` |
 | `wsl/docs/wsl.md` | WSL-first 开发环境说明 |
+| `wsl/docs/config.md` | WSL 工具配置层（nvim、starship、tmux、bat、lazygit、git、bash 别名） |
 | `wsl/docs/tools.md` | WSL 工具用途、常用方式和恢复边界 |
 | `wsl/docs/wsl-boundaries.md` | WSL 敏感配置和数据边界 |
 

@@ -1,0 +1,8 @@
+# PowerShell modules installed by windows/configure.ps1 -Pwsh (CurrentUser scope).
+# configure.ps1 reads this file directly, so it is the single source of truth.
+# One module name per line; '#' comments allowed. No versions/secrets here.
+
+PSReadLine
+posh-git
+Terminal-Icons
+PSFzf

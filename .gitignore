@@ -30,6 +30,7 @@ values.yaml
 **/config.yml
 !**/config.example.yaml
 !**/config.example.yml
+!wsl/config/lazygit/config.yml
 **/profiles.yaml
 **/providers/
 **/subscriptions*

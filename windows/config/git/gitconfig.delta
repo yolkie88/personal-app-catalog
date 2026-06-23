@@ -1,0 +1,14 @@
+# Managed by personal-app-catalog. Sanitized template only - no identity, no credentials.
+# delta pager settings, included via include.path only when `delta` is installed
+# (gated by `windows/configure.ps1 -Git`). Without delta, Git falls back to its default pager.
+
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false

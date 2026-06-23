@@ -39,7 +39,11 @@ function Invoke-PlanCommand {
     Write-Host "[plan] $Command"
 }
 
-Assert-WslCommand
+# -Plan is a pure dry run that prints what would run, so it must not require wsl.exe
+# (CI executes it on Linux pwsh). Only assert the command for real execution.
+if (-not $Plan.IsPresent) {
+    Assert-WslCommand
+}
 
 if ($Plan.IsPresent) {
     Invoke-PlanCommand "wsl.exe --list --verbose"
