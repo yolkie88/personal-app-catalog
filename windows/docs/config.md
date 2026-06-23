@@ -29,12 +29,26 @@
 | 模板 | 应用目标 | 作用 |
 |---|---|---|
 | `config/pwsh/modules.txt` | `Install-Module -Scope CurrentUser` | 模块清单：PSReadLine、posh-git、Terminal-Icons、PSFzf |
-| `config/pwsh/profile.ps1` | `catalog.profile.ps1`（由 `$PROFILE` dot-source） | PSReadLine 历史预测、模块按存在与否加载、starship、PSFzf 键位、常用 alias |
+| `config/pwsh/profile.ps1` | `catalog.profile.ps1`（由 `$PROFILE` dot-source） | PSReadLine 历史预测、模块按存在与否加载、starship、PSFzf 键位、常用 alias、当前 session 代理开关 |
 | `config/terminal/settings.defaults.json` | Windows Terminal `settings.json`（深合并） | 默认字体、配色、padding 等 defaults |
 | `config/git/gitconfig.shared` | `~\catalog.gitconfig`（通过 `include.path` 引入） | 常用 alias、合理默认值（merge/diff/pull/push/init/rebase；不含身份，无外部依赖） |
 | `config/git/gitconfig.delta` | `~\catalog-delta.gitconfig`（仅在检测到 delta 时通过 `include.path` 引入） | delta pager 与 diff filter 设置 |
-| `config/vscode/extensions.txt` | `code --install-extension`（逐个，已装则跳过） | 推荐扩展清单：WSL Remote、Docker、K8s、Python、TS/Vue、Java、YAML、Markdown、GitLens、GitHub Actions、REST Client |
-| `config/vscode/settings.json` | VS Code 用户 `settings.json`（深合并） | formatOnSave、各语言默认 formatter、关闭遥测等（不含账号/Sync 密钥/token） |
+| `config/vscode/extensions.txt` | `code --install-extension`（逐个，已装则跳过） | 推荐扩展清单：Remote/Containers、K8s、Python、TS/Vue、Java/Spring Boot、YAML/TOML/Markdown、Git、Jupyter、项目管理、中文语言包 |
+| `config/vscode/settings.json` | VS Code 用户 `settings.json`（深合并） | formatOnSave、各语言默认 formatter、关闭遥测、允许中文文档非 ASCII 等（不含账号/Sync 密钥/token） |
+
+## 代理
+
+Windows 代理策略见 `windows/docs/proxy.md`。本项目推荐 mihomo core + Web UI 的轻量方案：系统代理优先，WinHTTP 按需同步，少数不走系统代理的软件单独处理，TUN 仅兜底。
+
+PowerShell profile 提供当前 session 的代理开关：
+
+```powershell
+proxy-on
+proxy-status
+proxy-off
+```
+
+这些函数只修改当前 PowerShell 进程和子进程的代理环境变量，不改 Windows 系统代理、WinHTTP 或注册表。
 
 ## 依赖闭环
 
@@ -51,3 +65,4 @@
 - 配置层不是 winget profile，不进入 `bootstrap.ps1` 的 `ValidateSet`、`all` 集合或 `catalog.md` 的 profile 表。
 - JSON 模板（Windows Terminal、VS Code settings）里以 `_` 开头的 key 是模板元数据（如 `_comment`），`configure.ps1` 深合并前会剥掉，不会写进你的真实配置。
 - VS Code 配置层是可选的（`configure.ps1 -VSCode`）：只管理推荐扩展和脱敏 settings 默认值，深合并保留你已有的 key。**不管理**账号登录、Settings Sync 密钥、私有扩展源——这些仍走 VS Code 自带 Settings Sync 或手工恢复。
+- 代理模板只提供本机默认地址和临时开关；mihomo 订阅、节点、控制端 secret、日志和缓存不入库。

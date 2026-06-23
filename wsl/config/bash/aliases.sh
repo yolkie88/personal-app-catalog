@@ -24,6 +24,37 @@ alias gd='git diff'
 alias gl='git log --oneline --graph --decorate -20'
 alias lg='lazygit'
 
+# Session-only proxy helpers. Assumes Windows mihomo listens on 127.0.0.1:7890.
+# Works best with WSL mirrored networking; only affects the current shell and children.
+proxy_on() {
+  local proxy_host="${1:-127.0.0.1}"
+  local proxy_port="${2:-7890}"
+  local http="http://${proxy_host}:${proxy_port}"
+  local socks="socks5h://${proxy_host}:${proxy_port}"
+  local bypass="localhost,127.0.0.1,::1,.local,.internal"
+
+  export http_proxy="$http"
+  export https_proxy="$http"
+  export HTTP_PROXY="$http"
+  export HTTPS_PROXY="$http"
+  export all_proxy="$socks"
+  export ALL_PROXY="$socks"
+  export no_proxy="$bypass"
+  export NO_PROXY="$bypass"
+
+  echo "proxy on: ${http}"
+}
+
+proxy_off() {
+  unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
+  unset all_proxy ALL_PROXY no_proxy NO_PROXY
+  echo "proxy off"
+}
+
+proxy_status() {
+  env | grep -Ei '^(http|https|all|no)_proxy=' || true
+}
+
 # Safer defaults.
 alias mkdir='mkdir -p'
 
