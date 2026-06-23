@@ -45,7 +45,14 @@ mirrored 模式下，WSL 通常可以直接访问 Windows 本机的 `127.0.0.1:7
 
 ## Shell 临时代理函数
 
-`wsl/config/bash/aliases.sh` 提供以下函数：
+这些函数来自**配置层**，不随装包自动出现。`wsl/bootstrap.sh --base --cli --k8s --docker` 只装软件、不碰配置；要拿到下面的代理开关，需显式应用配置模板（`--config`，或包含它的 `--all`）：
+
+```bash
+./wsl/bootstrap.sh --config --plan   # 先预览（会先备份现有文件）
+./wsl/bootstrap.sh --config          # 应用
+```
+
+应用后 `wsl/config/bash/aliases.sh` 提供以下函数：
 
 ```bash
 proxy_on

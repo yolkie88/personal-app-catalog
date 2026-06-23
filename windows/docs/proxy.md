@@ -56,7 +56,14 @@ WinHTTP 影响范围比普通用户代理更大，本项目不建议脚本默认
 
 ## PowerShell 临时代理函数
 
-`windows/config/pwsh/profile.ps1` 提供临时代理开关：
+这些函数来自**配置层**，不随装包自动出现。`windows\bootstrap.ps1`、`proxy-core` 等只装软件、不碰配置；要拿到下面的代理开关，需显式应用 PowerShell profile 模板：
+
+```powershell
+.\windows\configure.ps1 -Pwsh -Plan   # 先预览（会先备份现有 $PROFILE）
+.\windows\configure.ps1 -Pwsh         # 应用
+```
+
+应用后 `windows/config/pwsh/profile.ps1` 提供临时代理开关：
 
 ```powershell
 proxy-on
