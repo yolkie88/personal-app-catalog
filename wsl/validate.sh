@@ -60,6 +60,7 @@ test_required_files() {
     "${SCRIPT_DIR}/docs/tools.md"
     "${SCRIPT_DIR}/docs/wsl-boundaries.md"
     "${SCRIPT_DIR}/docs/config.md"
+    "${SCRIPT_DIR}/docs/proxy.md"
     "${SCRIPT_DIR}/docs/container-runtimes.md"
     "${SCRIPT_DIR}/config/nvim/init.lua"
     "${SCRIPT_DIR}/config/starship/starship.toml"
