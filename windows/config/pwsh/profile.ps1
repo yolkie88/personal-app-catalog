@@ -31,6 +31,43 @@ if (Get-Command starship -ErrorAction SilentlyContinue) {
     Invoke-Expression (& starship init powershell)
 }
 
+# --- Session-only proxy helpers ------------------------------------------------
+# These helpers assume mihomo listens on 127.0.0.1:7890. They only affect the
+# current PowerShell process and child processes; they do not change Windows
+# system proxy, WinHTTP, registry, or persisted tool config.
+function proxy-on {
+    param(
+        [string] $HostName = "127.0.0.1",
+        [int] $Port = 7890
+    )
+
+    $http = "http://${HostName}:${Port}"
+    $socks = "socks5h://${HostName}:${Port}"
+    $bypass = "localhost,127.0.0.1,::1,.local,.internal"
+
+    $env:http_proxy = $http
+    $env:https_proxy = $http
+    $env:HTTP_PROXY = $http
+    $env:HTTPS_PROXY = $http
+    $env:all_proxy = $socks
+    $env:ALL_PROXY = $socks
+    $env:no_proxy = $bypass
+    $env:NO_PROXY = $bypass
+
+    Write-Host "proxy on: $http"
+}
+
+function proxy-off {
+    foreach ($name in @("http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY", "all_proxy", "ALL_PROXY", "no_proxy", "NO_PROXY")) {
+        Remove-Item "Env:$name" -ErrorAction SilentlyContinue
+    }
+    Write-Host "proxy off"
+}
+
+function proxy-status {
+    Get-ChildItem Env: | Where-Object { $_.Name -match '^(http|https|all|no)_proxy$' } | Sort-Object Name
+}
+
 # --- Aliases / shortcuts ------------------------------------------------------
 function ll { Get-ChildItem -Force @args }
 function la { Get-ChildItem -Force -Hidden @args }
