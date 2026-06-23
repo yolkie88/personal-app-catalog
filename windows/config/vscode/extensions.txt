@@ -3,8 +3,8 @@
 # Template only: no account, no Settings Sync keys, no private extension feeds.
 
 # Remote / containers / kubernetes (WSL-first workflow)
-ms-vscode-remote.remote-wsl
-ms-azuretools.vscode-docker
+ms-vscode-remote.vscode-remote-extensionpack
+ms-azuretools.vscode-containers
 ms-kubernetes-tools.vscode-kubernetes-tools
 
 # Python
@@ -17,15 +17,30 @@ dbaeumer.vscode-eslint
 esbenp.prettier-vscode
 Vue.volar
 
-# Java
+# Java / Spring Boot
 vscjava.vscode-java-pack
+vmware.vscode-boot-dev-pack
+vscjava.vscode-gradle
 
 # Data / markup / config
 redhat.vscode-yaml
+tamasfe.even-better-toml
 yzhang.markdown-all-in-one
+davidanson.vscode-markdownlint
 editorconfig.editorconfig
+mechatroner.rainbow-csv
 
 # Git / GitHub / HTTP
 eamodio.gitlens
+mhutchie.git-graph
 github.vscode-github-actions
 humao.rest-client
+
+# Notebook
+ms-toolsai.jupyter
+
+# Workspace
+alefragnani.project-manager
+
+# Localization
+ms-ceintl.vscode-language-pack-zh-hans
