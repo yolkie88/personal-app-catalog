@@ -43,7 +43,7 @@ function proxy-on {
 
     $http = "http://${HostName}:${Port}"
     $socks = "socks5h://${HostName}:${Port}"
-    $bypass = "localhost,127.0.0.1,::1,.local,.internal"
+    $bypass = "localhost,127.0.0.1,::1,.local,.internal,.svc,.cluster.local,10.0.0.0/8"
 
     $env:http_proxy = $http
     $env:https_proxy = $http

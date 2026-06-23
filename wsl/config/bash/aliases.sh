@@ -31,7 +31,7 @@ proxy_on() {
   local proxy_port="${2:-7890}"
   local http="http://${proxy_host}:${proxy_port}"
   local socks="socks5h://${proxy_host}:${proxy_port}"
-  local bypass="localhost,127.0.0.1,::1,.local,.internal"
+  local bypass="localhost,127.0.0.1,::1,.local,.internal,.svc,.cluster.local,10.0.0.0/8"
 
   export http_proxy="$http"
   export https_proxy="$http"

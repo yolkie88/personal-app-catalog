@@ -60,8 +60,10 @@ proxy_test
 http_proxy=http://127.0.0.1:7890
 https_proxy=http://127.0.0.1:7890
 all_proxy=socks5h://127.0.0.1:7890
-no_proxy=localhost,127.0.0.1,::1,.local,.internal
+no_proxy=localhost,127.0.0.1,::1,.local,.internal,.svc,.cluster.local,10.0.0.0/8
 ```
+
+`no_proxy` 里的 `.svc` / `.cluster.local` / `10.0.0.0/8` 是为 k8s、Docker 等内网流量准备的，避免集群内部、私网地址被代理污染。如果你的私网用的是别的网段（如 `172.16.0.0/12`、`192.168.0.0/16`），按需在本机追加。
 
 需要代理时显式开启：
 
