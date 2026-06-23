@@ -155,6 +155,8 @@ eval "$(mise activate bash)"
 
 mise、Scoop、Docker 都通过上游安装脚本（`curl | sh`）引导，刻意不固定版本：好处是跟随上游修复，代价是恢复结果不完全可复现。
 
+`--cli` 通过 `MISE_PYTHON_COMPILE=0` 让 mise 装预编译版 Python（python-build-standalone），不走 pyenv 源码编译——省掉一堆构建依赖，也避开 pyenv 脚本在 `git core.autocrlf=true` 下被写成 CRLF 导致的 `bash\r` 失败。WSL 里建议把 `git config --global core.autocrlf input` 设上，避免类似问题。
+
 ## 与 Windows 的分工
 
 | 场景 | 推荐位置 |

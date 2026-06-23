@@ -216,6 +216,11 @@ mise_use_global() {
 install_cli_tools() {
   install_mise
 
+  # Install prebuilt python (python-build-standalone) instead of compiling it via
+  # pyenv. Compiling needs extra build deps and breaks when the cloned pyenv
+  # scripts pick up CRLF line endings (e.g. with git core.autocrlf=true).
+  export MISE_PYTHON_COMPILE=0
+
   echo "==> WSL CLI toolchain"
   local tools
   mapfile -t tools < <(print_file_items "${PACKAGES_DIR}/cli.txt")
