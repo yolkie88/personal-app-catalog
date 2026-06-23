@@ -55,6 +55,32 @@ proxy_status() {
   env | grep -Ei '^(http|https|all|no)_proxy=' || true
 }
 
+# Quick connectivity + egress check. curl honours the proxy env automatically,
+# whether it was set by proxy_on or injected by WSL autoProxy; with no proxy env
+# it tests a direct connection. Tells apart "proxy down" from "no proxy active".
+proxy_test() {
+  local probe="${1:-https://www.gstatic.com/generate_204}"
+  local ip_url="${2:-https://api.ipify.org}"
+
+  if [ -n "${https_proxy:-}" ]; then
+    echo "shell proxy: ${https_proxy}"
+  else
+    echo "shell proxy: none (direct)"
+  fi
+
+  local code
+  code="$(curl -fsS -o /dev/null -w '%{http_code}' --max-time 8 "$probe" 2>/dev/null || true)"
+  if [ -n "$code" ] && [ "$code" != "000" ]; then
+    echo "connectivity: ok (${code})"
+  else
+    echo "connectivity: FAILED -> ${probe}"
+  fi
+
+  local ip
+  ip="$(curl -fsS --max-time 8 "$ip_url" 2>/dev/null || true)"
+  echo "egress ip: ${ip:-unavailable}"
+}
+
 # Safer defaults.
 alias mkdir='mkdir -p'
 

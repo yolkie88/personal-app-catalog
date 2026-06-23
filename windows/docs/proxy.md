@@ -62,6 +62,7 @@ WinHTTP 影响范围比普通用户代理更大，本项目不建议脚本默认
 proxy-on
 proxy-status
 proxy-off
+proxy-test
 ```
 
 默认值：
@@ -72,6 +73,49 @@ SOCKS:  socks5h://127.0.0.1:7890
 ```
 
 这些函数只修改当前 PowerShell session 的环境变量，不写注册表、不改系统代理、不持久化。
+
+`proxy-test` 做一次连通性 + 出口 IP 自检：
+
+- 当前 shell 设了 `https_proxy`（即跑过 `proxy-on`）时，走该代理测试；
+- 没设时，走 Windows 系统代理默认值测试。
+
+它能区分“代理没起来”和“代理起来了但当前没选中它”，对应“可诊断”原则。
+
+## Web UI（web 端）
+
+mihomo 自身不带面板，Web UI 是连接 `external-controller` 的独立前端。本项目推荐两种轻量方式，二选一：
+
+1. **托管面板（最轻量，无需安装）**：直接用浏览器打开托管版仪表盘，例如 metacubexd / zashboard / yacd，填入：
+   - API 地址：`http://127.0.0.1:9090`
+   - secret：与 mihomo 配置里的 `secret` 一致
+
+   托管页面是 https 来源访问本地 http 控制端，mihomo 需要放开 CORS：
+
+   ```yaml
+   external-controller: 127.0.0.1:9090
+   secret: "replace-with-local-secret"
+   external-controller-cors:
+     allow-origins: ["*"]
+     allow-private-network: true
+   ```
+
+2. **本地内置面板（离线可用）**：让 mihomo 自己托管前端，把面板静态文件放到本地目录：
+
+   ```yaml
+   external-controller: 127.0.0.1:9090
+   secret: "replace-with-local-secret"
+   external-ui: ui
+   external-ui-name: metacubexd
+   external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+   ```
+
+   之后面板地址为 `http://127.0.0.1:9090/ui/`。
+
+原则：
+
+- 控制端只监听 `127.0.0.1:9090`，secret 必填，不留空、不入库。
+- 选托管面板时只对本地控制端开 CORS；不开 `allow-lan`、不把控制端暴露到局域网。
+- 面板订阅、节点、secret 都是设备本地运行期状态，不进仓库。
 
 ## 不走系统代理的软件
 

@@ -22,7 +22,7 @@ Git 身份（`user.name` / `user.email`）、SSH/GPG、各类账号登录、Powe
 
 ## 代理核心
 
-`proxy-core` 只安装 Mihomo、sing-box 和 WinSW。真实配置按设备维护，倾向以系统服务运行，并按设备开启 TUN。
+`proxy-core` 只安装 Mihomo 和 WinSW（mihomo 作为首选主核心，WinSW 用于服务化）。sing-box 不再默认安装，作为可选备用核心，需要时手工 `winget install SagerNet.sing-box`。真实配置按设备维护，倾向以系统服务运行，TUN 只按设备、按需开启。
 
 建议边界：
 
