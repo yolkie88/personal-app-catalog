@@ -30,6 +30,19 @@ wsl --shutdown
 
 mirrored 模式下，WSL 通常可以直接访问 Windows 本机的 `127.0.0.1:7890`。
 
+## autoProxy 与 proxy_on 如何配合
+
+`.wslconfig` 里的 `autoProxy=true` 和下面的 `proxy_on` 不是二选一，而是分工，理解这点能避免叠加和困惑：
+
+- **`autoProxy`（自动、被动）**：WSL 发行版启动时，会根据 **Windows 系统代理**自动注入 `HTTP_PROXY` / `HTTPS_PROXY` 等环境变量。所以当 mihomo 已开启系统代理时，新开的 WSL shell **通常已经有代理**，不需要再 `proxy_on`。它一般只给 http/https，不一定给 `all_proxy`（SOCKS）。
+- **`proxy_on`（手动、主动）**：用于以下场景——系统代理没开但你只想让某个 shell 走代理；或需要 `all_proxy`/SOCKS；或想临时改 host/port。
+
+需要注意的叠加关系：
+
+- 如果 autoProxy 已注入代理，再 `proxy_on` 只是覆盖成相同/自定义的值，影响不大。
+- 但 `proxy_off` 是 `unset`，它**不会恢复** autoProxy 注入的值——要恢复 autoProxy 的自动代理，新开一个 shell 即可。
+- 判断当前 shell 到底有没有代理、是谁给的，用 `proxy_status` 和 `proxy_test`（见下）。
+
 ## Shell 临时代理函数
 
 `wsl/config/bash/aliases.sh` 提供以下函数：
@@ -38,6 +51,7 @@ mirrored 模式下，WSL 通常可以直接访问 Windows 本机的 `127.0.0.1:7
 proxy_on
 proxy_status
 proxy_off
+proxy_test
 ```
 
 `proxy_on` 只修改当前 shell session 的环境变量：
@@ -46,8 +60,10 @@ proxy_off
 http_proxy=http://127.0.0.1:7890
 https_proxy=http://127.0.0.1:7890
 all_proxy=socks5h://127.0.0.1:7890
-no_proxy=localhost,127.0.0.1,::1,.local,.internal
+no_proxy=localhost,127.0.0.1,::1,.local,.internal,.svc,.cluster.local,10.0.0.0/8
 ```
+
+`no_proxy` 里的 `.svc` / `.cluster.local` / `10.0.0.0/8` 是为 k8s、Docker 等内网流量准备的，避免集群内部、私网地址被代理污染。如果你的私网用的是别的网段（如 `172.16.0.0/12`、`192.168.0.0/16`），按需在本机追加。
 
 需要代理时显式开启：
 
@@ -60,6 +76,12 @@ curl https://github.com
 
 ```bash
 proxy_off
+```
+
+自检连通性和出口 IP（`curl` 会自动读取代理环境变量，无论是 `proxy_on` 还是 autoProxy 注入的）：
+
+```bash
+proxy_test
 ```
 
 建议不要在 `.bashrc` 里默认调用 `proxy_on`。否则访问内网仓库、Kubernetes、数据库、局域网服务时容易被代理污染。

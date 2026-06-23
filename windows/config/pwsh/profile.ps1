@@ -43,7 +43,7 @@ function proxy-on {
 
     $http = "http://${HostName}:${Port}"
     $socks = "socks5h://${HostName}:${Port}"
-    $bypass = "localhost,127.0.0.1,::1,.local,.internal"
+    $bypass = "localhost,127.0.0.1,::1,.local,.internal,.svc,.cluster.local,10.0.0.0/8"
 
     $env:http_proxy = $http
     $env:https_proxy = $http
@@ -66,6 +66,40 @@ function proxy-off {
 
 function proxy-status {
     Get-ChildItem Env: | Where-Object { $_.Name -match '^(http|https|all|no)_proxy$' } | Sort-Object Name
+}
+
+# Quick connectivity + egress check. Uses the shell proxy env (set by proxy-on)
+# when present; otherwise relies on the Windows system proxy default. Helps tell
+# apart "proxy down" from "proxy up but not selected".
+function proxy-test {
+    param(
+        [string] $Url = "https://www.gstatic.com/generate_204",
+        [string] $IpUrl = "https://api.ipify.org"
+    )
+
+    $common = @{ TimeoutSec = 8; UseBasicParsing = $true; ErrorAction = "Stop" }
+    if ($env:https_proxy) {
+        $common.Proxy = $env:https_proxy
+        Write-Host "shell proxy: $($env:https_proxy)"
+    } else {
+        Write-Host "shell proxy: none (using Windows system proxy default)"
+    }
+
+    try {
+        $resp = Invoke-WebRequest -Uri $Url -MaximumRedirection 0 @common
+        Write-Host "connectivity: ok ($($resp.StatusCode))"
+    } catch {
+        $code = $_.Exception.Response.StatusCode.value__
+        if ($code) { Write-Host "connectivity: ok ($code)" }
+        else { Write-Host "connectivity: FAILED -> $($_.Exception.Message)" }
+    }
+
+    try {
+        $ip = (Invoke-WebRequest -Uri $IpUrl @common).Content.Trim()
+        Write-Host "egress ip: $ip"
+    } catch {
+        Write-Host "egress ip: unavailable"
+    }
 }
 
 # --- Aliases / shortcuts ------------------------------------------------------

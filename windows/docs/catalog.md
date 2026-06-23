@@ -37,7 +37,7 @@ Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。
 | `security-toolkit` | 是，配置和证书手工 | 加密、网络和安全调试工具 | VeraCrypt, WireGuard, Wireshark, Nmap |
 | `creative` | 是，大体积数据手工 | 创作和建模工具 | Shotcut, Blender, FreeCAD |
 | `local-ai` | 是，数据手工 | Windows 侧本地模型工具 | Ollama, Jan, LM Studio |
-| `proxy-core` | 是，配置手工 | 代理核心二进制 | Mihomo, sing-box, WinSW |
+| `proxy-core` | 是，配置手工 | 代理核心二进制 | Mihomo, WinSW（sing-box 可选，手工安装） |
 
 ## 工具箱层
 
