@@ -63,6 +63,7 @@ cd ~/projects
 | `wsl/docs/wsl.md` | WSL-first 开发环境原则和初始化流程 |
 | `wsl/docs/tools.md` | WSL 工具用途、常用方式和恢复边界 |
 | `wsl/docs/config.md` | WSL 工具配置层说明 |
+| `wsl/docs/proxy.md` | WSL mirrored、开发工具、Docker daemon 的代理策略 |
 | `wsl/docs/container-runtimes.md` | 容器运行时默认方案和候选方案 |
 | `wsl/docs/wsl-boundaries.md` | WSL 敏感配置、凭据和数据边界 |
 
@@ -112,12 +113,23 @@ wsl --shutdown
 
 WSL Containers 记录为未来候选容器运行时，不替代当前默认 Docker Engine in WSL。候选验证清单和晋升规则见 `wsl/docs/container-runtimes.md`。
 
+Docker daemon 代理属于本机运行期配置，不由 `wsl/bootstrap.sh` 默认写入。需要代理 `docker pull` / build 时，按 `wsl/docs/proxy.md` 手工配置 systemd drop-in 或 build args。
+
 推荐边界：
 
 - Docker Engine 安装在主开发发行版内；
 - 项目 volume、Compose 文件和开发脚本放在 WSL；
 - Docker 登录状态、registry token 和私有镜像凭据不入库；
 - 不同时维护 Docker Desktop 和 WSL 内 Docker Engine 两套主运行时。
+
+## 代理策略
+
+Windows 侧优先使用 mihomo core + Web UI 的轻量方式，主要依赖系统代理；WSL 在 mirrored networking 下优先访问 `127.0.0.1:7890`，并通过 `proxy_on` / `proxy_off` 控制当前 shell 的代理环境变量。
+
+详细方案见：
+
+- `windows/docs/proxy.md`
+- `wsl/docs/proxy.md`
 
 ## K8s 策略
 
