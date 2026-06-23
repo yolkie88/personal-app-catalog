@@ -5,6 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGES_DIR="${SCRIPT_DIR}/packages"
 CONFIG_DIR="${SCRIPT_DIR}/config"
 
+BOOTSTRAP_FAILURES=()
+
 INSTALL_BASE=false
 INSTALL_CLI=false
 INSTALL_K8S=false
@@ -226,9 +228,17 @@ install_cli_tools() {
   mapfile -t tools < <(print_file_items "${PACKAGES_DIR}/cli.txt")
   printf '  %s\n' "${tools[@]}"
 
+  local failed=()
   for tool in "${tools[@]}"; do
-    mise_use_global "$tool"
+    if ! mise_use_global "$tool"; then
+      failed+=("$tool")
+    fi
   done
+
+  if [[ ${#failed[@]} -gt 0 ]]; then
+    echo "WARNING: failed to install: ${failed[*]}" >&2
+    BOOTSTRAP_FAILURES+=("${failed[@]}")
+  fi
 }
 
 install_k8s_tools() {
@@ -239,9 +249,17 @@ install_k8s_tools() {
   mapfile -t tools < <(print_file_items "${PACKAGES_DIR}/k8s.txt")
   printf '  %s\n' "${tools[@]}"
 
+  local failed=()
   for tool in "${tools[@]}"; do
-    mise_use_global "$tool"
+    if ! mise_use_global "$tool"; then
+      failed+=("$tool")
+    fi
   done
+
+  if [[ ${#failed[@]} -gt 0 ]]; then
+    echo "WARNING: failed to install: ${failed[*]}" >&2
+    BOOTSTRAP_FAILURES+=("${failed[@]}")
+  fi
 }
 
 install_docker_engine() {
@@ -408,6 +426,12 @@ fi
 
 if [[ "$INSTALL_BASE" == true || "$INSTALL_CLI" == true ]]; then
   ensure_shell_hooks
+fi
+
+if [[ ${#BOOTSTRAP_FAILURES[@]} -gt 0 ]]; then
+  echo "==> WSL bootstrap completed with failures:" >&2
+  printf '  %s\n' "${BOOTSTRAP_FAILURES[@]}" >&2
+  exit 1
 fi
 
 echo "==> WSL bootstrap completed."
