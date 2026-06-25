@@ -43,15 +43,36 @@ proxy-providers:
       url: https://www.gstatic.com/generate_204
       interval: 300
 
-# 也可直接写 proxies:（静态节点，同样是私有值，按需填写）。
+# 也可直接写静态节点。下面是 VLESS + Vision + REALITY 模板（自建节点常用，私有值用 REPLACE_ME 标出）：
+proxies:
+  - name: "vless-reality"
+    type: vless
+    server: REPLACE_ME_SERVER          # 服务器地址或域名
+    port: 443
+    uuid: REPLACE_ME_UUID              # 服务端生成的 UUID
+    network: tcp
+    udp: true
+    tls: true
+    flow: xtls-rprx-vision             # Vision 流控（REALITY 标配）
+    servername: REPLACE_ME_SNI         # REALITY 借用的目标域名，需与服务端 dest / serverNames 一致
+    client-fingerprint: chrome         # uTLS 指纹：chrome / firefox / safari / ios / random
+    reality-opts:
+      public-key: REPLACE_ME_PUBLIC_KEY  # 服务端公钥（x25519，与私钥配对）
+      short-id: REPLACE_ME_SHORT_ID      # 可选，与服务端 short-id 一致；没有就删掉本行
 
 proxy-groups:
+  # 订阅(use: airport)和自建节点(proxies: vless-reality)可同时出现；
+  # 只用其中一种时，把另一种来源行删掉，并删掉上面对应的 proxy-providers / proxies 段。
   - name: PROXY
     type: select
+    proxies:
+      - vless-reality
     use:
       - airport
   - name: AUTO
     type: url-test
+    proxies:
+      - vless-reality
     use:
       - airport
     url: https://www.gstatic.com/generate_204
