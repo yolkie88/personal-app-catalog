@@ -29,6 +29,47 @@ external-controller-cors:
 # external-ui-name: metacubexd
 # external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 
+# ---- DNS ----
+# 完整生效于 TUN / fake-ip 模式；系统代理模式下，它决定 mihomo 对直连和规则匹配
+# 域名的解析方式（代理流量的域名解析通常在远端完成）。
+dns:
+  enable: true
+  ipv6: false
+
+  # enhanced-mode / fake-ip 主要配合 TUN 使用，按需开启：
+  # enhanced-mode: fake-ip
+  # fake-ip-range: 198.18.0.1/16
+  # fake-ip-filter: ["+.lan", "+.local", "geosite:cn"]
+
+  # 用来解析下面 DoH 服务器域名的引导 DNS，必须是纯 IP：
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  # 默认解析器（建议用加密 DNS）：
+  nameserver:
+    - https://223.5.5.5/dns-query
+    - https://1.1.1.1/dns-query
+
+  # 可能被污染的结果走 fallback，再按地区过滤：
+  fallback:
+    - https://8.8.8.8/dns-query
+    - https://1.0.0.1/dns-query
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+
+  # *** 指定某些域名走特定 DNS ***
+  # key 是域名匹配（支持 +. 通配、geosite:、rule-set:），value 是该域名使用的 DNS。
+  # 命中 policy 的域名会跳过 fallback，直接用这里指定的解析器。
+  nameserver-policy:
+    "geosite:cn":
+      - https://223.5.5.5/dns-query        # 国内域名走阿里 DoH
+    "+.company.internal":
+      - 10.0.0.53                          # 内网域名走内网 DNS（按需改/删）
+    "+.example.com":
+      - 8.8.8.8                            # 指定单个域名走指定 DNS（示例）
+
 # ---- 节点来源（私有，必填）----
 # 推荐用 proxy-providers 拉订阅；订阅 URL 是私有运行期状态，换成自己的，不入库。
 # providers/ 目录已被 .gitignore 忽略。
@@ -79,8 +120,25 @@ proxy-groups:
     interval: 300
 
 # ---- 规则 ----
+# GEOSITE/GEOIP 依赖 geo 数据库，mihomo 启动时若缺失会自动下载（需联网）。
+# 规则自上而下匹配，命中即停；MATCH 是兜底。
 rules:
-  - GEOIP,CN,DIRECT
+  # 局域网 / 本机直连
+  - GEOIP,private,DIRECT,no-resolve
+  - GEOSITE,private,DIRECT
+
+  # 广告拦截（可选，默认注释）
+  # - GEOSITE,category-ads-all,REJECT
+
+  # 自定义示例：把特定域名固定走代理或直连（按需改/删）
+  - DOMAIN-SUFFIX,openai.com,PROXY
+  - DOMAIN-SUFFIX,lan,DIRECT
+
+  # 国内直连
+  - GEOSITE,cn,DIRECT
+  - GEOIP,cn,DIRECT,no-resolve
+
+  # 其余走代理
   - MATCH,PROXY
 
 # ---- TUN（兜底，默认关闭）----
