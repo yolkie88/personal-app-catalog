@@ -4,7 +4,7 @@
   "Sources": [
     {
       "Packages": [
-        { "PackageIdentifier": "Google.Chrome.EXE" },
+        { "PackageIdentifier": "Google.Chrome" },
         { "PackageIdentifier": "M2Team.NanaZip" },
         { "PackageIdentifier": "Microsoft.PowerShell" },
         { "PackageIdentifier": "Microsoft.WindowsTerminal" },
