@@ -1,0 +1,26 @@
+# update-exclude.txt
+#
+# winget package IDs that should NOT be batch-upgraded by update.ps1 -Exclude.
+# These are apps where a blind "winget upgrade --all" is risky: proxy cores,
+# remote-control agents, drivers, hardware tuners, and licensed software whose
+# version is pinned to a key, a device, or a known-good config.
+#
+# Format: one winget PackageIdentifier per line. '#' comments and blank lines
+# are ignored. Find an ID with: winget list  /  winget search <name>.
+#
+# update.ps1 -Exclude holds each active entry with a winget pin, so
+# 'winget upgrade --all' skips it. Releasing it later:
+#   winget pin remove --id <id>
+#
+# Nothing is held by default. Uncomment the IDs you want to freeze.
+
+# --- proxy core (version tied to a working config / rule set) ---
+# MetaCubeX.Mihomo
+# CloudBees.WindowsServiceWrapper.3
+
+# --- network / remote access ---
+# Tailscale.Tailscale
+
+# --- examples of other things you usually pin (not installed by this catalog) ---
+# NVIDIA drivers, GPU/peripheral tuners, vendor utilities, licensed apps:
+# Nvidia.GeForceExperience

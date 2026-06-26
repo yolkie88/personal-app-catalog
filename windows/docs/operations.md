@@ -158,7 +158,32 @@ wsl --shutdown
 .\windows\update.ps1 -All -IncludeScoop
 ```
 
-代理核心、远控、硬件调校、驱动、授权软件不要盲目跟随批量更新。
+代理核心、远控、硬件调校、驱动、授权软件不要盲目跟随批量更新。把这些包的 winget ID 写进 `windows/manifests/update-exclude.txt`（一行一个，`#` 注释，默认全部注释即不冻结任何包），再加 `-Exclude`，更新时会用 winget pin 把它们挂住，让 `winget upgrade --all` 跳过：
+
+```powershell
+.\windows\update.ps1 -Exclude              # 只读列出可升级项，并提示哪些会被挂住
+.\windows\update.ps1 -All -Exclude         # 升级全部，但跳过排除清单里的包
+```
+
+被挂住的包保持 pin 状态。查看 `winget pin list`，释放某个用 `winget pin remove --id <id>`。
+
+### 自动更新（计划任务）
+
+`windows/schedule-update.ps1` 把上面的更新封成一个 Windows 计划任务（plan-first、幂等，`-Force` 重注册同名任务）。先预览：
+
+```powershell
+.\windows\schedule-update.ps1 -Exclude -Plan
+```
+
+注册（默认每周日 03:00 跑 `update.ps1 -All`）：
+
+```powershell
+.\windows\schedule-update.ps1 -Exclude                       # 每周日 03:00
+.\windows\schedule-update.ps1 -Frequency Daily -Time 04:30 -Exclude -IncludeScoop
+.\windows\schedule-update.ps1 -Elevated -Exclude             # 以最高权限运行，覆盖需提权的机器级升级
+```
+
+任务只在当前用户登录时运行（不存密码）。手动触发用 `Start-ScheduledTask -TaskName personal-app-catalog-update`，移除用 `.\windows\schedule-update.ps1 -Remove`。
 
 WSL 侧更新按发行版和工具链分别处理：
 
