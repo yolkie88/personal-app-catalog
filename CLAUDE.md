@@ -19,6 +19,7 @@ Manifests are the single source of truth and the scripts only read them — neve
 - **Meta-profiles** are resolved in `bootstrap.ps1`'s `Resolve-Profiles`: `default` → `core + agentic-dev`; `all` → a deliberately loose set (`core, agentic-dev, daily, media, gaming`), *not* everything.
 - **WSL package lists** live in `wsl/packages/` and `wsl/bootstrap.sh` reads them directly: `apt-base.txt` (apt package names), `cli.txt` and `k8s.txt` (mise tool selectors, each requiring an `@` version like `@latest`/`@lts`/exact), `docker.txt` (apt packages for Docker Engine).
 - **WSL-first boundary** is an enforced invariant: Docker, Node.js, Kubernetes CLIs, and the main developer CLI toolchain belong in WSL, not Windows. `Docker.DockerDesktop`, `OpenJS.NodeJS.LTS`, and `OpenAI.Codex` are explicitly forbidden from the Windows manifests by validation.
+- **The publish layer** handles winget *archive/portable* packages (mihomo, WinSW) that winget unzips into a hashed `%LOCALAPPDATA%\Microsoft\WinGet\Packages\<Id>_<source>\` folder with no PATH shim — hard to find and reference. `windows/manifests/tools-publish.json` maps each `wingetId` → `subdir`/`targetExe`, and `windows/publish-tools.ps1` (plan-first, idempotent, backs up before overwrite) copies the resolved exe into a stable tools root (default `C:\Tools`, override with `-ToolsRoot`). winget stays the version source — re-run publish after `winget upgrade`. Like the config layer this is **not** a winget profile (keep it out of `ValidateSet`/`all`/profile tables); validation requires every `wingetId` in the publish map to be installed by some `winget-*.json`. WinSW service definitions ship as sanitized anchors under `windows/proxy/*.example.xml` (binary only is published; registering the service is a manual admin step).
 
 ### The config (tool-optimization) layer
 
@@ -77,6 +78,13 @@ Tool-config layer (opt-in, plan-first, backs up before overwriting):
 ```powershell
 .\windows\configure.ps1 -All -Plan            # preview PowerShell/Terminal/Git config
 .\windows\configure.ps1 -All                  # apply (or -Pwsh / -Terminal / -Git individually)
+```
+
+Publish layer — copy winget archive/portable exes (mihomo, WinSW) into a stable tools root (plan-first, idempotent, backs up before overwrite); re-run after `winget upgrade`:
+
+```powershell
+.\windows\publish-tools.ps1 -Plan             # preview copies into C:\Tools (per tools-publish.json)
+.\windows\publish-tools.ps1                    # apply (or -ToolsRoot D:\Tools to relocate)
 ```
 
 Distro management, updates, and snapshots:

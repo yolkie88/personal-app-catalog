@@ -39,6 +39,8 @@ Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。
 | `local-ai` | 是，数据手工 | Windows 侧本地模型工具 | Ollama, Jan, LM Studio |
 | `proxy-core` | 是，配置手工 | 代理核心二进制 | Mihomo, WinSW（sing-box 可选，手工安装） |
 
+> `proxy-core` 的两个包是 winget portable 包，exe 埋在 `WinGet\Packages` 哈希目录里。装完用 `.\windows\publish-tools.ps1` 把它们落到固定的 `C:\Tools\mihomo\`（映射见 `windows/manifests/tools-publish.json`）。这不是一个 winget profile，只是 publish 一层；详见 `windows/docs/proxy.md`。
+
 ## 工具箱层
 
 | Profile | 定位 | 说明 |

@@ -1,0 +1,17 @@
+{
+  "_comment": "Publish map for winget archive/portable packages. winget installs these into a hashed per-package folder under %LOCALAPPDATA%\\Microsoft\\WinGet\\Packages with a platform-suffixed exe and no PATH shim, which is hard to find and reference. publish-tools.ps1 copies the resolved exe into a predictable tools root (default C:\\Tools\\<subdir>\\<targetExe>) so launchers and the WinSW service can point at a stable path. winget stays the source of truth for versions; re-run publish after 'winget upgrade'. Every wingetId here must be installed by some winget-*.json manifest (validate.ps1 enforces this).",
+  "tools": [
+    {
+      "wingetId": "MetaCubeX.Mihomo",
+      "sourceExe": "mihomo-windows-amd64.exe",
+      "subdir": "mihomo",
+      "targetExe": "mihomo.exe"
+    },
+    {
+      "wingetId": "CloudBees.WindowsServiceWrapper.3",
+      "sourceExe": "winsw.exe",
+      "subdir": "mihomo",
+      "targetExe": "mihomo-service.exe"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<!--
+  Sanitized WinSW service template (recovery anchor) for running the mihomo core as
+  an auto-start Windows service. No secrets, no identity.
+
+  Recovery steps:
+    1. winget install (proxy-core profile) + .\windows\publish-tools.ps1
+       so C:\Tools\mihomo\mihomo.exe and mihomo-service.exe (WinSW) exist.
+    2. Copy this file next to the WinSW exe as C:\Tools\mihomo\mihomo-service.xml
+       (WinSW reads <exe-basename>.xml, hence the mihomo-service.* pair).
+    3. From an elevated shell:  mihomo-service.exe install  then  mihomo-service.exe start
+
+  The mihomo config (subscription, secret, nodes) lives in the -d directory below
+  (default C:\ProgramData\mihomo) and never enters Git. See config.example.yaml.
+-->
+<service>
+  <id>mihomo</id>
+  <name>mihomo</name>
+  <description>mihomo proxy core service</description>
+
+  <executable>C:\Tools\mihomo\mihomo.exe</executable>
+  <arguments>-d C:\ProgramData\mihomo</arguments>
+  <workingdirectory>C:\ProgramData\mihomo</workingdirectory>
+
+  <startmode>Automatic</startmode>
+
+  <onfailure action="restart" delay="5 sec"/>
+  <onfailure action="restart" delay="30 sec"/>
+  <resetfailure>1 hour</resetfailure>
+
+  <logpath>C:\ProgramData\mihomo\logs</logpath>
+  <log mode="roll-by-size-time">
+    <sizeThreshold>10485760</sizeThreshold>
+    <pattern>yyyyMMdd</pattern>
+    <autoRollAtTime>00:00:00</autoRollAtTime>
+  </log>
+</service>

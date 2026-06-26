@@ -159,6 +159,57 @@ function Test-WingetManifests {
     }
 }
 
+function Test-ToolsPublishManifest {
+    $path = Join-Path $ManifestDir "tools-publish.json"
+    if (-not (Test-Path $path)) {
+        Add-Failure "Missing tools-publish.json."
+        return
+    }
+
+    try {
+        $manifest = Get-Content -Path $path -Raw | ConvertFrom-Json
+    } catch {
+        Add-Failure "Invalid JSON: tools-publish.json"
+        return
+    }
+
+    $tools = @($manifest.tools)
+    if ($tools.Count -eq 0) {
+        Add-Failure "tools-publish.json has no tools entries."
+        return
+    }
+
+    # Collect every winget package the catalog actually installs.
+    $wingetPackages = @{}
+    foreach ($file in Get-ChildItem -Path $ManifestDir -Filter "winget-*.json") {
+        try {
+            $wm = Get-Content -Path $file.FullName -Raw | ConvertFrom-Json
+        } catch {
+            continue
+        }
+        foreach ($source in @($wm.Sources)) {
+            foreach ($package in @($source.Packages)) {
+                if ($package.PackageIdentifier) {
+                    $wingetPackages[[string] $package.PackageIdentifier] = $true
+                }
+            }
+        }
+    }
+
+    foreach ($tool in $tools) {
+        foreach ($field in @("wingetId", "sourceExe", "subdir", "targetExe")) {
+            if ([string]::IsNullOrWhiteSpace([string] $tool.$field)) {
+                Add-Failure "tools-publish.json entry is missing required field '$field'."
+            }
+        }
+
+        $id = [string] $tool.wingetId
+        if ($id -and -not $wingetPackages.ContainsKey($id)) {
+            Add-Failure "tools-publish.json references '$id' which no winget-*.json manifest installs."
+        }
+    }
+}
+
 function Test-MsstoreManifests {
     param([string[]] $BootstrapProfiles)
 
@@ -353,6 +404,9 @@ function Test-RequiredFiles {
     $required = @(
         "windows/wsl-distro.ps1",
         "windows/configure.ps1",
+        "windows/publish-tools.ps1",
+        "windows/manifests/tools-publish.json",
+        "windows/proxy/mihomo-service.example.xml",
         "windows/config/pwsh/profile.ps1",
         "windows/config/pwsh/modules.txt",
         "windows/config/terminal/settings.defaults.json",
@@ -464,6 +518,7 @@ $bootstrapProfiles = @(Get-BootstrapProfiles)
 $manifestProfiles = @(Get-ManifestProfiles)
 
 Test-WingetManifests
+Test-ToolsPublishManifest
 Test-MsstoreManifests -BootstrapProfiles $bootstrapProfiles
 Test-ProfileMapping -BootstrapProfiles $bootstrapProfiles -ManifestProfiles $manifestProfiles
 Test-DocumentedProfiles -BootstrapProfiles $bootstrapProfiles

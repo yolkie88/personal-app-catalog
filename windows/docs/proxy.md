@@ -35,7 +35,7 @@ log-level: info
 - 订阅、节点、控制端 secret、机场名称不入库。
 - 使用 `mixed-port` 简化工具配置，HTTP / SOCKS 都统一指向 `127.0.0.1:7890`。
 
-完整的脱敏示例配置见 `windows/proxy/config.example.yaml`：复制为 `config.yaml` 放进 mihomo 配置目录（Windows 默认 `%USERPROFILE%\.config\mihomo\`），再填入订阅 URL 与 `secret` 两处私有值即可。`mihomo` 找不到配置时会自动生成一份只含监听骨架、无任何节点的默认配置，所以恢复时以本示例为准、不要依赖那份空壳默认。
+完整的脱敏示例配置见 `windows/proxy/config.example.yaml`：复制为 `config.yaml` 放进 mihomo 配置目录（Windows 默认 `%USERPROFILE%\.config\mihomo\`）。**默认主力是自建 VLESS（Vision + REALITY）节点**——填入节点私有值（`server` / `uuid` / `servername` / `public-key` 等）与本机 `secret` 即可跑起来。**订阅默认关闭、只作临时应急**：自建节点全挂时，再按文件内注释整段启用 `proxy-providers` + `EMERGENCY` 组，平时不依赖机场。`mihomo` 找不到配置时会自动生成一份只含监听骨架、无任何节点的默认配置，所以恢复时以本示例为准、不要依赖那份空壳默认。
 
 ## Windows 系统代理和 WinHTTP
 
@@ -90,7 +90,7 @@ SOCKS:  socks5h://127.0.0.1:7890
 
 它能区分“代理没起来”和“代理起来了但当前没选中它”，对应“可诊断”原则。
 
-同一份 profile 还提供 `mihomo` 启动器。`proxy-core` 用 winget 装的 `MetaCubeX.Mihomo` 既不建 PATH shim、可执行文件名又是带平台后缀的 `mihomo-windows-amd64.exe`，所以直接敲 `mihomo` 会“找不到命令”。该函数按 `MetaCubeX.Mihomo_*` 目录动态定位 exe（适配版本升级），转发全部参数：
+同一份 profile 还提供 `mihomo` 启动器。`proxy-core` 用 winget 装的 `MetaCubeX.Mihomo` 既不建 PATH shim、可执行文件名又是带平台后缀的 `mihomo-windows-amd64.exe`，所以直接敲 `mihomo` 会“找不到命令”。该函数优先用 `publish-tools.ps1` 落到 `C:\Tools\mihomo\mihomo.exe` 的固定路径（与 WinSW 服务同一个 exe），找不到时再回退到 winget 安装目录里动态定位，转发全部参数：
 
 ```powershell
 mihomo -v                                    # 查看版本
@@ -98,7 +98,47 @@ mihomo -t -d "$env:USERPROFILE\.config\mihomo"   # 只校验配置后退出
 mihomo -d "$env:USERPROFILE\.config\mihomo"      # 按配置目录运行
 ```
 
-未应用配置层、或想绕过函数时，用 winget 安装目录里的完整路径运行同一个 exe 即可。
+未应用配置层、或想绕过函数时，用 `C:\Tools\mihomo\mihomo.exe` 或 winget 安装目录里的完整路径运行同一个 exe 即可。
+
+## 把便携内核落到 C:\Tools（publish-tools.ps1）
+
+`MetaCubeX.Mihomo` 和 `CloudBees.WindowsServiceWrapper.3`（WinSW）都是 winget 的 **archive / portable** 包：没有安装器、没有开始菜单项、不建 PATH shim，exe 被解压到 `%LOCALAPPDATA%\Microsoft\WinGet\Packages\<Id>_<source>\` 这种带哈希后缀的目录里，名字还带平台后缀，确实“不太好找”。winget 仍负责下载与升级（`winget upgrade` 照常用），但 exe 留在那个埋得很深的目录里。
+
+`windows\publish-tools.ps1` 在保留 winget 作为下载/升级来源的前提下，把解析到的 exe **复制**到一个可预期的工具根目录，落成稳定文件名。映射写在 `windows/manifests/tools-publish.json`（每个 `wingetId` 必须由某个 `winget-*.json` 真正安装，`validate.ps1` 会校验）：
+
+| winget 包 | 落地路径（默认根 `C:\Tools`） |
+|---|---|
+| `MetaCubeX.Mihomo` | `C:\Tools\mihomo\mihomo.exe` |
+| `CloudBees.WindowsServiceWrapper.3` | `C:\Tools\mihomo\mihomo-service.exe` |
+
+```powershell
+.\windows\bootstrap.ps1 -Profile proxy-core   # 先用 winget 装内核（下载到 WinGet\Packages）
+.\windows\publish-tools.ps1 -Plan             # 预览要复制什么、备份什么
+.\windows\publish-tools.ps1                    # 落地到 C:\Tools（覆盖前先 .bak 备份）
+.\windows\publish-tools.ps1 -ToolsRoot D:\Tools  # 想换根目录就传 -ToolsRoot
+```
+
+特点与本仓库其余安装器一致：**plan-first**（`-Plan` 只打印不写盘）、**幂等**（按文件哈希比对，相同就跳过）、**覆盖前先备份**（时间戳 `.bak`）。
+
+关键点：**升级后要重新 publish**。`winget upgrade MetaCubeX.Mihomo` 只更新埋在 `WinGet\Packages` 里的那份；`C:\Tools\mihomo\mihomo.exe`（也就是 WinSW 服务实际加载的 exe）不会自动跟着变。升级内核后再跑一次 `.\windows\publish-tools.ps1`，服务下次重启即用上新二进制——因为服务指向的是固定路径，不需要重新注册。
+
+## mihomo 作为 Windows 服务（WinSW）
+
+WinSW 把 mihomo 内核包装成开机自启的 Windows 服务。约定是把 WinSW 的 exe 重命名成 `mihomo-service.exe`、把服务定义放成同名的 `mihomo-service.xml` 与之并列（`publish-tools.ps1` 已经把 WinSW 落成 `C:\Tools\mihomo\mihomo-service.exe`）。
+
+仓库里以 `windows/proxy/mihomo-service.example.xml` 作为**脱敏恢复锚点**（无任何密钥/订阅/身份），它指向 `C:\Tools\mihomo\mihomo.exe`，配置目录用 `-d C:\ProgramData\mihomo`、日志滚动到 `C:\ProgramData\mihomo\logs`。恢复时：
+
+```powershell
+# 1) 已经 winget 装好并 publish 到 C:\Tools\mihomo
+# 2) 复制锚点为实际服务定义（按需改 -d 配置目录）
+Copy-Item windows\proxy\mihomo-service.example.xml C:\Tools\mihomo\mihomo-service.xml
+
+# 3) 注册并启动（需管理员）——这是设备相关的一次性手工动作
+C:\Tools\mihomo\mihomo-service.exe install
+C:\Tools\mihomo\mihomo-service.exe start
+```
+
+边界：注册服务需要管理员、属于设备相关状态，不写进脚本默认流程（见 `windows/docs/manual-boundaries.md`）。mihomo 的真实配置（订阅、节点、secret）留在 `-d` 指向的 `C:\ProgramData\mihomo`，以 `config.example.yaml` 为恢复基线，不入库。
 
 ## Web UI（web 端）
 

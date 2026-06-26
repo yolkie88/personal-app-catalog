@@ -102,14 +102,21 @@ function proxy-test {
     }
 }
 
-# Launcher for the winget-installed mihomo core. winget adds no PATH shim and
-# ships the binary under a versioned name, so resolve it dynamically (robust to
-# version bumps) and forward args, e.g. mihomo -d "$env:USERPROFILE\.config\mihomo".
+# Launcher for the mihomo core. Prefer the copy published into the tools root by
+# publish-tools.ps1 (stable path, same one the WinSW service uses); fall back to the
+# winget package dir, which adds no PATH shim and ships a platform-suffixed name.
+# Forwards args, e.g. mihomo -d "$env:USERPROFILE\.config\mihomo".
 function mihomo {
-    $exe = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\MetaCubeX.Mihomo_*\mihomo-windows-amd64.exe" -ErrorAction SilentlyContinue |
-        Select-Object -First 1
+    $exe = $null
+    $published = "C:\Tools\mihomo\mihomo.exe"
+    if (Test-Path $published) {
+        $exe = Get-Item $published
+    } else {
+        $exe = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\MetaCubeX.Mihomo_*\mihomo-windows-amd64.exe" -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+    }
     if (-not $exe) {
-        Write-Host "mihomo not found. Install it with: winget install MetaCubeX.Mihomo"
+        Write-Host "mihomo not found. Install it (winget install MetaCubeX.Mihomo) then publish it: .\windows\publish-tools.ps1"
         return
     }
     & $exe.FullName @args

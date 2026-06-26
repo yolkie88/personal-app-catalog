@@ -70,21 +70,11 @@ dns:
     "+.example.com":
       - 8.8.8.8                            # 指定单个域名走指定 DNS（示例）
 
-# ---- 节点来源（私有，必填）----
-# 推荐用 proxy-providers 拉订阅；订阅 URL 是私有运行期状态，换成自己的，不入库。
-# providers/ 目录已被 .gitignore 忽略。
-proxy-providers:
-  airport:
-    type: http
-    url: "REPLACE_ME_SUBSCRIPTION_URL"
-    interval: 86400
-    path: ./providers/airport.yaml
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 300
+# ---- 节点来源 ----
+# 默认主力 = 自建节点（下面的 proxies 段）。订阅只作临时应急：默认关闭，
+# 自建节点全挂时再按注释整段启用。providers/ 目录已被 .gitignore 忽略。
 
-# 也可直接写静态节点。下面是 VLESS + Vision + REALITY 模板（自建节点常用，私有值用 REPLACE_ME 标出）：
+# 自建节点（默认主力）：VLESS + Vision + REALITY 模板，私有值用 REPLACE_ME 标出。
 proxies:
   - name: "vless-reality"
     type: vless
@@ -101,23 +91,46 @@ proxies:
       public-key: REPLACE_ME_PUBLIC_KEY  # 服务端公钥（x25519，与私钥配对）
       short-id: REPLACE_ME_SHORT_ID      # 可选，与服务端 short-id 一致；没有就删掉本行
 
+# 应急订阅（可选，默认关闭）：仅在自建节点不可用时临时启用。
+# 启用步骤：① 取消下面 proxy-providers 整段注释并填入订阅 URL；
+#           ② 取消 proxy-groups 里 EMERGENCY 组的注释；
+#           ③ 取消 PROXY 组里 "- EMERGENCY" 那行的注释。
+# proxy-providers:
+#   airport:
+#     type: http
+#     url: "REPLACE_ME_SUBSCRIPTION_URL"
+#     interval: 86400
+#     path: ./providers/airport.yaml
+#     health-check:
+#       enable: true
+#       url: https://www.gstatic.com/generate_204
+#       interval: 300
+
 proxy-groups:
-  # 订阅(use: airport)和自建节点(proxies: vless-reality)可同时出现；
-  # 只用其中一种时，把另一种来源行删掉，并删掉上面对应的 proxy-providers / proxies 段。
+  # 主入口：默认就走自建 vless-reality（select 组默认选第一项）。规则里的 PROXY 都指向这里。
   - name: PROXY
     type: select
     proxies:
       - vless-reality
-    use:
-      - airport
-  - name: AUTO
-    type: url-test
-    proxies:
-      - vless-reality
-    use:
-      - airport
-    url: https://www.gstatic.com/generate_204
-    interval: 300
+      - DIRECT
+      # 应急时取消下一行注释（并启用上面的订阅 + 下面的 EMERGENCY 组）：
+      # - EMERGENCY
+
+  # 多个自建节点时启用，自动择优（当前只有一个，默认关闭）：
+  # - name: AUTO
+  #   type: url-test
+  #   proxies:
+  #     - vless-reality
+  #   url: https://www.gstatic.com/generate_204
+  #   interval: 300
+
+  # 应急组（默认关闭）：自建节点全挂时切到 PROXY -> EMERGENCY，从订阅里自动回落到可用节点。
+  # - name: EMERGENCY
+  #   type: fallback
+  #   use:
+  #     - airport
+  #   url: https://www.gstatic.com/generate_204
+  #   interval: 300
 
 # ---- 规则 ----
 # GEOSITE/GEOIP 依赖 geo 数据库，mihomo 启动时若缺失会自动下载（需联网）。
