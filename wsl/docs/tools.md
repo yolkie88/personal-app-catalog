@@ -75,14 +75,14 @@ Docker 放在 WSL 内作为主容器运行时，不在 Windows 默认层安装 D
 
 ## Agentic 编码 CLI：`wsl/packages/agents.txt`
 
-Claude Code、Codex CLI 用各自官方原生安装器（`curl | sh`）装到 `~/.local/bin`，自带后台自更新。`bootstrap.sh --agents` 只做首次安装（二进制已存在则跳过），更新交给工具自己——和 winget 侧"自更新 app 不进批量升级"同理。Windows 上的 Claude / Codex 桌面 App 是 GUI 入口，与这里的 CLI 互补。
+Claude Code、Codex CLI 使用各自官方的非 npm 安装方式。Claude Code 走官方签名 apt 仓库（默认 `stable` channel），Codex 走官方原生安装器。`bootstrap.sh --agents` 只做首次安装（二进制已存在则跳过）。Windows 上的 Claude / Codex 桌面 App 是 GUI 入口，与这里的 CLI 互补。
 
 | 工具 | 用途 | 安装/更新 | 恢复边界 |
 |---|---|---|---|
-| claude（Claude Code） | 终端 agentic 编码 | `curl -fsSL https://claude.ai/install.sh \| bash`；后台自更新 | 登录、权限、项目上下文手工恢复，不入库 |
+| claude（Claude Code） | 终端 agentic 编码 | `bootstrap.sh --agents` 配置官方 apt 仓库后安装 `claude-code`；更新走 `sudo apt update && sudo apt upgrade claude-code` | 登录、权限、项目上下文手工恢复，不入库 |
 | codex（Codex CLI） | 终端 agentic 编码 | `curl -fsSL https://chatgpt.com/codex/install.sh \| sh`；自更新 | ChatGPT/API 登录状态不入库 |
 
-> 首次运行需登录（`claude` / `codex`），属手工边界。受限网络下先 `proxy_on` 再装。
+> 首次运行需登录（`claude` / `codex`），属手工边界。受限网络下先 `./wsl/bootstrap.sh --proxy` 配常开代理再装。
 
 ## 脚本和校验工具
 

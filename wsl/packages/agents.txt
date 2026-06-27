@@ -1,12 +1,11 @@
-# Agentic coding CLIs, installed via each tool's official native installer
-# (curl | sh). These ship a self-contained binary into ~/.local/bin and
-# self-update, so `bootstrap.sh --agents` only does the FIRST install (it skips
-# when the binary is already present) — updates are the tool's own job, the same
-# way self-updating apps are excluded from winget batch upgrades.
+# Agentic coding CLIs. Use each vendor's official non-npm install surface.
 #
-# Format: <binary-to-check>|<https installer url>
+# Format:
+#   <binary-to-check>|apt|<apt-package>|<channel>
+#   <binary-to-check>|installer|<https installer url>
+#
 # Auth (claude / codex login) is a manual first-run step and never stored here.
 # In a restricted network run `proxy_on` before installing.
 
-claude|https://claude.ai/install.sh
-codex|https://chatgpt.com/codex/install.sh
+claude|apt|claude-code|stable
+codex|installer|https://chatgpt.com/codex/install.sh

@@ -120,21 +120,32 @@ test_agents_list() {
   fi
 
   declare -A seen=()
-  local line name url
+  local line name method source extra
   for line in "${items[@]}"; do
-    name="${line%%|*}"
-    url="${line#*|}"
-    if [[ "$name" == "$line" || -z "$name" || -z "$url" ]]; then
-      add_failure "wsl/packages/agents.txt entry '${line}' must be '<binary>|<https-installer-url>'."
+    IFS='|' read -r name method source extra <<< "$line"
+    if [[ -z "$name" || -z "$method" || -z "$source" ]]; then
+      add_failure "wsl/packages/agents.txt entry '${line}' must be '<binary>|apt|<apt-package>|<channel>' or '<binary>|installer|<https-installer-url>'."
       continue
     fi
     if [[ -n "${seen[$name]:-}" ]]; then
       add_failure "Duplicate agent '${name}' in wsl/packages/agents.txt."
     fi
     seen[$name]=1
-    if [[ "$url" != https://* ]]; then
-      add_failure "wsl/packages/agents.txt entry '${name}' installer URL must use https://."
-    fi
+    case "$method" in
+      apt)
+        if [[ -z "${extra:-}" || ! "$extra" =~ ^(stable|latest)$ ]]; then
+          add_failure "wsl/packages/agents.txt apt entry '${name}' must specify channel stable or latest."
+        fi
+        ;;
+      installer)
+        if [[ "$source" != https://* ]]; then
+          add_failure "wsl/packages/agents.txt installer entry '${name}' URL must use https://."
+        fi
+        ;;
+      *)
+        add_failure "wsl/packages/agents.txt entry '${name}' has unsupported install method '${method}'."
+        ;;
+    esac
   done
 }
 

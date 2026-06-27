@@ -58,7 +58,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 ## 5. 初始化 WSL 主开发环境
 
-> 顺序很重要：**先装发行版 → 配 mirrored 网络 → 让 apt 能走代理 → 再装工具链**。否则受限网络下 `--base`（apt）可能拉不到包。
+> 顺序很重要：**先装发行版 → 配 mirrored 网络 → 配 WSL 常开代理 → 再装工具链**。否则受限网络下 `apt`、Docker、mise、Git 和 agentic CLI 都可能拉不到包。
 
 ### 5.1 安装发行版
 
@@ -81,16 +81,16 @@ wsl --shutdown                   # 重启 WSL 生效
 wslinfo --networking-mode
 ```
 
-### 5.3 让 apt 能走代理
+### 5.3 配置 WSL 常开代理
 
-确保 Windows 侧 mihomo 已监听 `127.0.0.1:7890`。mirrored 下 WSL（含 root）可直接访问它。`sudo apt` 不继承 shell 的代理变量，所以给 apt 单独配（详见 `wsl/docs/proxy.md` 的 apt 小节）：
+确保 Windows 侧 mihomo 已监听 `127.0.0.1:7890`。mirrored 下 WSL（含 root）可直接访问它。先预览，再写常开代理（详见 `wsl/docs/proxy.md`）：
 
 ```bash
-sudo tee /etc/apt/apt.conf.d/99proxy >/dev/null <<'EOF'
-Acquire::http::Proxy "http://127.0.0.1:7890";
-Acquire::https::Proxy "http://127.0.0.1:7890";
-EOF
+./wsl/bootstrap.sh --proxy --plan
+./wsl/bootstrap.sh --proxy
 ```
+
+这一步会写 shell 环境变量、apt、Git include 配置和 Docker daemon 代理。已有 `~/.docker/config.json` 时不会覆盖，避免误删 registry 登录。
 
 ### 5.4 安装工具链
 
@@ -101,7 +101,7 @@ EOF
 ./wsl/bootstrap.sh --base --cli --k8s --config --agents
 ```
 
-`--cli` / `--k8s` 走 mise（预编译二进制，下载读 `http_proxy`，可先 `proxy_on`）。`--config` 应用脱敏配置模板（nvim、starship、tmux、别名、git 等），覆盖前先备份。`--agents` 用官方原生安装器装 Claude Code / Codex（自更新，受限网络先 `proxy_on`）。
+`--cli` / `--k8s` 走 mise（预编译二进制，读取 `proxy.env` 注入的代理变量）。`--config` 应用脱敏配置模板（nvim、starship、tmux、别名、git 等），覆盖前先备份。`--agents` 用官方非 npm 渠道安装 agentic CLI：Claude Code 走官方 apt 仓库，Codex 走官方原生安装器。
 
 ### 5.5 安装 Docker Engine
 
@@ -113,18 +113,10 @@ EOF
 wsl --shutdown
 ```
 
-重新进入 WSL 后，受限网络下还要给 **Docker daemon** 单独配代理：systemd 里的 daemon（root）不继承 shell 代理变量，不配则 `docker pull` 连不上 registry（DNS 都解析不了）。这与 apt 的 `99proxy` 同理（详见 `wsl/docs/proxy.md` 的 Docker Engine 小节）：
+重新进入 WSL 后，再跑一次 `--proxy` 或直接用 `--docker --proxy`，确保 Docker daemon drop-in 已写入并在服务存在后生效：
 
 ```bash
-sudo mkdir -p /etc/systemd/system/docker.service.d
-sudo tee /etc/systemd/system/docker.service.d/proxy.conf >/dev/null <<'EOF'
-[Service]
-Environment="HTTP_PROXY=http://127.0.0.1:7890"
-Environment="HTTPS_PROXY=http://127.0.0.1:7890"
-Environment="NO_PROXY=localhost,127.0.0.1,::1"
-EOF
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+./wsl/bootstrap.sh --proxy
 ```
 
 确认：
@@ -137,11 +129,7 @@ docker run --rm hello-world
 
 ### 5.6 收尾
 
-基础包装完后，若不想 apt 长期依赖代理（mihomo 关掉会报错），移除临时代理：
-
-```bash
-sudo rm -f /etc/apt/apt.conf.d/99proxy
-```
+代理是常开状态，`99proxy` 和 Docker drop-in 默认保留。只有某台设备改成直连网络时，再按 `wsl/docs/proxy.md` 的“移除或改代理”手工清理。
 
 ## 6. 恢复账号和基础配置
 

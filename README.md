@@ -32,7 +32,7 @@ WSL 侧需要先有 Linux 发行版。本项目默认发行版基线是 `Ubuntu-
 
 首次安装后需要启动该发行版一次，创建 Linux 用户。
 
-装 apt 包前先配 mirrored 网络（受限网络下还需让 apt 走代理，见 `wsl/docs/proxy.md` 的 apt 小节）：
+装 apt 包前先配 mirrored 网络，并在 WSL 内配置常开代理（受限网络下 apt、Docker、mise、Git 和 agentic CLI 都依赖它）：
 
 ```powershell
 .\windows\configure.ps1 -Wsl
@@ -43,6 +43,8 @@ wsl --shutdown
 
 ```bash
 bash wsl/validate.sh
+./wsl/bootstrap.sh --proxy --plan
+./wsl/bootstrap.sh --proxy
 ./wsl/bootstrap.sh --base --cli --k8s --plan
 ./wsl/bootstrap.sh --base --cli --k8s
 ```
@@ -50,7 +52,7 @@ bash wsl/validate.sh
 Docker Engine 安装到 WSL：
 
 ```bash
-./wsl/bootstrap.sh --docker
+./wsl/bootstrap.sh --docker --proxy
 ```
 
 常用显式 Windows profile：
