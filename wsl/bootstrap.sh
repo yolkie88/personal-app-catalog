@@ -157,8 +157,13 @@ ensure_mise_shell_activation() {
   fi
   cat >> "$rc" <<'RC'
 
-# Put mise-managed toolchains (node, python, ...) on PATH.
-eval "$(mise activate bash)"
+# Put ~/.local/bin (mise binary, fd/bat shims) on PATH for non-login shells (e.g.
+# `bash` from Windows reads ~/.bashrc but not ~/.profile), then activate mise.
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH" ;;
+esac
+command -v mise >/dev/null 2>&1 && eval "$(mise activate bash)"
 RC
   echo "==> Enabled mise activation in ${rc}. Open a new shell or run: source ${rc}"
 }
