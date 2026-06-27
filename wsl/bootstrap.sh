@@ -421,7 +421,7 @@ install_agents() {
   # on PATH for future shells even if --cli was not run (this block also adds it).
   ensure_mise_shell_activation
 
-  local line name url
+  local line name url script
   while IFS= read -r line; do
     name="${line%%|*}"
     url="${line#*|}"
@@ -434,11 +434,19 @@ install_agents() {
       continue
     fi
     if [[ "$PLAN" == true ]]; then
-      echo "  [plan] curl -fsSL ${url} | bash   # ${name}"
+      echo "  [plan] curl -fsSL ${url} -o <tmp> && bash <tmp> </dev/null   # ${name}"
       continue
     fi
     echo "  installing: ${name}"
-    if ! curl -fsSL "$url" | bash; then
+    # Download then run with stdin from /dev/null. Piping `curl | bash` makes an
+    # installer's interactive prompt read leftover pipe data (e.g. Codex's "Start
+    # now?") and some then try to launch in a non-tty; /dev/null makes them take
+    # defaults non-interactively.
+    script="$(mktemp)"
+    if curl -fsSL "$url" -o "$script" && bash "$script" </dev/null; then
+      rm -f "$script"
+    else
+      rm -f "$script"
       echo "WARNING: failed to install ${name} from ${url}" >&2
       BOOTSTRAP_FAILURES+=("${name}")
     fi
