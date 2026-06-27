@@ -9,7 +9,8 @@
         { "PackageIdentifier": "AntibodySoftware.WizTree" },
         { "PackageIdentifier": "CrystalDewWorld.CrystalDiskInfo" },
         { "PackageIdentifier": "CrystalDewWorld.CrystalDiskMark" },
-        { "PackageIdentifier": "REALiX.HWiNFO" }
+        { "PackageIdentifier": "REALiX.HWiNFO" },
+        { "PackageIdentifier": "Devolutions.UniGetUI" }
       ],
       "SourceDetails": {
         "Argument": "https://cdn.winget.microsoft.com/cache",

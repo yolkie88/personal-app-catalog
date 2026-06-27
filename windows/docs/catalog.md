@@ -6,7 +6,7 @@
 
 | Profile | 自动安装 | 定位 | 应用 |
 |---|---|---|---|
-| `core` | 是 | Windows 基础环境 | Chrome, NanaZip, PowerShell, Windows Terminal, Git, PowerToys, Everything, UniGetUI, LocalSend, Bitwarden |
+| `core` | 是 | Windows 基础环境 | Chrome, NanaZip, PowerShell, Windows Terminal, Git, PowerToys, Everything, LocalSend, Bitwarden |
 | `agentic-dev` | 是 | Agentic coding Windows 入口 | VS Code, Codex, Claude, GitHub CLI, WSL, Python Install Manager |
 
 `default` 等同于 `core + agentic-dev`。普通 winget 安装项以 `windows/manifests/winget-core.json` 和 `windows/manifests/winget-agentic-dev.json` 为准；Microsoft Store 安装项以 `windows/manifests/msstore-*.txt` 为准。
@@ -28,7 +28,7 @@ Docker、Node.js、Kubernetes CLI 和主力开发 CLI 由 WSL 侧清单管理。
 | `communication` | 是，账号手工 | 通讯、会议和输入法 | WeChat, WeType, WeCom, Tencent Meeting, Telegram |
 | `dev-extra` | 是 | Windows GUI 开发增强 | DBeaver, DB Browser for SQLite, SourceGit, Bruno, DevToys, WinMerge, draw.io |
 | `k8s-toolkit` | 是，集群凭据手工 | Windows 侧 Kubernetes / K3s 备用工具链 | kubectl, Helm, k9s, kubectx, kubens, stern, ORAS |
-| `maintenance` | 是，按需使用 | 系统维护、卸载、硬件和磁盘诊断 | BCUninstaller, Sysinternals Suite, WizTree, CrystalDiskInfo, CrystalDiskMark, HWiNFO |
+| `maintenance` | 是，按需使用 | 系统维护、卸载、硬件和磁盘诊断、包管理 GUI | BCUninstaller, Sysinternals Suite, WizTree, CrystalDiskInfo, CrystalDiskMark, HWiNFO, UniGetUI |
 | `desktop-enhance` | 是 | 桌面增强 | Twinkle Tray, EarTrumpet |
 | `media` | 是 | 基础媒体转换 | HandBrake, File Converter |
 | `media-toolkit` | 是 | 媒体工具链 | FFmpeg, yt-dlp, MKVToolNix, Subtitle Edit, Czkawka |
