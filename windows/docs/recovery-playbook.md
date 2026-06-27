@@ -113,11 +113,26 @@ EOF
 wsl --shutdown
 ```
 
-重新进入 WSL 后确认：
+重新进入 WSL 后，受限网络下还要给 **Docker daemon** 单独配代理：systemd 里的 daemon（root）不继承 shell 代理变量，不配则 `docker pull` 连不上 registry（DNS 都解析不了）。这与 apt 的 `99proxy` 同理（详见 `wsl/docs/proxy.md` 的 Docker Engine 小节）：
+
+```bash
+sudo mkdir -p /etc/systemd/system/docker.service.d
+sudo tee /etc/systemd/system/docker.service.d/proxy.conf >/dev/null <<'EOF'
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:7890"
+Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+Environment="NO_PROXY=localhost,127.0.0.1,::1"
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+确认：
 
 ```bash
 docker version
 docker compose version
+docker run --rm hello-world
 ```
 
 ### 5.6 收尾
