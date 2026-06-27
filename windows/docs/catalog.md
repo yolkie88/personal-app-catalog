@@ -7,7 +7,7 @@
 | Profile | 自动安装 | 定位 | 应用 |
 |---|---|---|---|
 | `core` | 是 | Windows 基础环境 | Chrome, NanaZip, PowerShell, Windows Terminal, Git, PowerToys, Everything, LocalSend, Bitwarden |
-| `agentic-dev` | 是 | Agentic coding Windows 入口 | VS Code, Codex, Claude, GitHub CLI, WSL, Python Install Manager |
+| `agentic-dev` | 是 | Agentic coding Windows 入口 | VS Code, Codex, Claude, WSL, Python Install Manager |
 
 `default` 等同于 `core + agentic-dev`。普通 winget 安装项以 `windows/manifests/winget-core.json` 和 `windows/manifests/winget-agentic-dev.json` 为准；Microsoft Store 安装项以 `windows/manifests/msstore-*.txt` 为准。
 

@@ -6,7 +6,6 @@
       "Packages": [
         { "PackageIdentifier": "Microsoft.VisualStudioCode" },
         { "PackageIdentifier": "Anthropic.Claude" },
-        { "PackageIdentifier": "GitHub.cli" },
         { "PackageIdentifier": "Microsoft.WSL" },
         { "PackageIdentifier": "Python.PythonInstallManager" }
       ],

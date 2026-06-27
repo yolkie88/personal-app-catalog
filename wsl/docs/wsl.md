@@ -8,6 +8,7 @@ WSL 是主开发执行环境，适合放：
 
 - 代码仓库；
 - Git、SSH、shell、脚本；
+- GitHub CLI（gh）、Claude Code、Codex 等开发与 agentic 编码 CLI；
 - Node.js、Python、uv、pnpm、mise 等语言和项目工具链；
 - kubectl、Helm、k9s、stern 等 Kubernetes / K3s 工具；
 - Docker Engine 和 Compose；

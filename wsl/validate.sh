@@ -56,6 +56,7 @@ test_required_files() {
     "${SCRIPT_DIR}/packages/cli.txt"
     "${SCRIPT_DIR}/packages/k8s.txt"
     "${SCRIPT_DIR}/packages/docker.txt"
+    "${SCRIPT_DIR}/packages/agents.txt"
     "${SCRIPT_DIR}/docs/wsl.md"
     "${SCRIPT_DIR}/docs/tools.md"
     "${SCRIPT_DIR}/docs/wsl-boundaries.md"
@@ -104,6 +105,39 @@ test_docker_list() {
   done
 }
 
+test_agents_list() {
+  local file="${PACKAGES_DIR}/agents.txt"
+  if [[ ! -f "$file" ]]; then
+    add_failure "Missing wsl/packages/agents.txt"
+    return
+  fi
+
+  local items=()
+  mapfile -t items < <(active_items "$file")
+  if [[ ${#items[@]} -eq 0 ]]; then
+    add_failure "wsl/packages/agents.txt has no active entries."
+    return
+  fi
+
+  declare -A seen=()
+  local line name url
+  for line in "${items[@]}"; do
+    name="${line%%|*}"
+    url="${line#*|}"
+    if [[ "$name" == "$line" || -z "$name" || -z "$url" ]]; then
+      add_failure "wsl/packages/agents.txt entry '${line}' must be '<binary>|<https-installer-url>'."
+      continue
+    fi
+    if [[ -n "${seen[$name]:-}" ]]; then
+      add_failure "Duplicate agent '${name}' in wsl/packages/agents.txt."
+    fi
+    seen[$name]=1
+    if [[ "$url" != https://* ]]; then
+      add_failure "wsl/packages/agents.txt entry '${name}' installer URL must use https://."
+    fi
+  done
+}
+
 test_config_templates() {
   local config_dir="${SCRIPT_DIR}/config"
   if [[ ! -d "$config_dir" ]]; then
@@ -145,6 +179,7 @@ test_shell_syntax() {
 test_required_files
 test_package_lists
 test_docker_list
+test_agents_list
 test_config_templates
 test_wsl_first_boundaries
 test_shell_syntax

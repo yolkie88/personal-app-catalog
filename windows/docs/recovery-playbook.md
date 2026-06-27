@@ -98,10 +98,10 @@ EOF
 
 ```bash
 ./wsl/bootstrap.sh --base --cli --k8s --plan
-./wsl/bootstrap.sh --base --cli --k8s --config
+./wsl/bootstrap.sh --base --cli --k8s --config --agents
 ```
 
-`--cli` / `--k8s` 走 mise（预编译二进制，下载读 `http_proxy`，可先 `proxy_on`）。`--config` 应用脱敏配置模板（nvim、starship、tmux、别名、git 等），覆盖前先备份。
+`--cli` / `--k8s` 走 mise（预编译二进制，下载读 `http_proxy`，可先 `proxy_on`）。`--config` 应用脱敏配置模板（nvim、starship、tmux、别名、git 等），覆盖前先备份。`--agents` 用官方原生安装器装 Claude Code / Codex（自更新，受限网络先 `proxy_on`）。
 
 ### 5.5 安装 Docker Engine
 

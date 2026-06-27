@@ -12,6 +12,7 @@ INSTALL_CLI=false
 INSTALL_K8S=false
 INSTALL_DOCKER=false
 INSTALL_CONFIG=false
+INSTALL_AGENTS=false
 PLAN=false
 
 usage() {
@@ -24,7 +25,8 @@ Options:
   --k8s       Install Kubernetes / K3s CLI tools through mise where possible
   --docker    Install Docker Engine inside WSL
   --config    Apply tool config templates (nvim, starship, tmux, bat, lazygit, git, bash aliases)
-  --all       Install base + cli + k8s + docker + config
+  --agents    Install agentic coding CLIs from packages/agents.txt (Claude Code, Codex)
+  --all       Install base + cli + k8s + docker + config + agents
   --plan      Print what would run without installing
   -h, --help  Show help
 
@@ -48,12 +50,14 @@ while [[ $# -gt 0 ]]; do
     --k8s) INSTALL_K8S=true ;;
     --docker) INSTALL_DOCKER=true ;;
     --config) INSTALL_CONFIG=true ;;
+    --agents) INSTALL_AGENTS=true ;;
     --all)
       INSTALL_BASE=true
       INSTALL_CLI=true
       INSTALL_K8S=true
       INSTALL_DOCKER=true
       INSTALL_CONFIG=true
+      INSTALL_AGENTS=true
       ;;
     --plan) PLAN=true ;;
     -h|--help)
@@ -69,7 +73,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-if [[ "$INSTALL_BASE" == false && "$INSTALL_CLI" == false && "$INSTALL_K8S" == false && "$INSTALL_DOCKER" == false && "$INSTALL_CONFIG" == false ]]; then
+if [[ "$INSTALL_BASE" == false && "$INSTALL_CLI" == false && "$INSTALL_K8S" == false && "$INSTALL_DOCKER" == false && "$INSTALL_CONFIG" == false && "$INSTALL_AGENTS" == false ]]; then
   usage
   exit 1
 fi
@@ -409,6 +413,38 @@ ensure_git_include() {
   fi
 }
 
+install_agents() {
+  local file="${PACKAGES_DIR}/agents.txt"
+  echo "==> Agentic coding CLIs (official native installers, self-updating)"
+
+  # Installers drop a self-contained binary into ~/.local/bin; make sure that is
+  # on PATH for future shells even if --cli was not run (this block also adds it).
+  ensure_mise_shell_activation
+
+  local line name url
+  while IFS= read -r line; do
+    name="${line%%|*}"
+    url="${line#*|}"
+    if [[ "$name" == "$line" || -z "$name" || -z "$url" ]]; then
+      echo "  [skip] malformed entry (need '<binary>|<url>'): ${line}" >&2
+      continue
+    fi
+    if command -v "$name" >/dev/null 2>&1; then
+      echo "  present: ${name} (self-updates; not reinstalled)"
+      continue
+    fi
+    if [[ "$PLAN" == true ]]; then
+      echo "  [plan] curl -fsSL ${url} | bash   # ${name}"
+      continue
+    fi
+    echo "  installing: ${name}"
+    if ! curl -fsSL "$url" | bash; then
+      echo "WARNING: failed to install ${name} from ${url}" >&2
+      BOOTSTRAP_FAILURES+=("${name}")
+    fi
+  done < <(print_file_items "$file")
+}
+
 if [[ "$INSTALL_BASE" == true ]]; then
   install_apt_base
 fi
@@ -427,6 +463,10 @@ fi
 
 if [[ "$INSTALL_CONFIG" == true ]]; then
   install_configs
+fi
+
+if [[ "$INSTALL_AGENTS" == true ]]; then
+  install_agents
 fi
 
 if [[ "$INSTALL_BASE" == true || "$INSTALL_CLI" == true ]]; then

@@ -44,6 +44,7 @@
 | zoxide@latest | 智能目录跳转 | `z <dir>` | 目录历史按设备生成，不入库 |
 | starship@latest | Shell prompt | 统一 bash/zsh prompt | 字体和主题配置按设备或模板处理 |
 | just@latest | 命令任务入口 | `just test`、`just dev`、`just deploy` | `justfile` 跟随项目仓库 |
+| gh@latest | GitHub CLI | `gh pr`、`gh repo`、`gh run`、`gh auth` | `gh auth` 登录状态和 token 不入库 |
 | yq@latest | YAML 处理 | K8s manifest、配置文件、CI YAML 修改 | 处理含 secret 的 YAML 时不要提交输出 |
 
 ## Kubernetes / K3s 工具：`wsl/packages/k8s.txt`
@@ -71,6 +72,17 @@ Docker 放在 WSL 内作为主容器运行时，不在 Windows 默认层安装 D
 | containerd.io | 容器运行时依赖 | Docker Engine 底层运行时 | 不单独维护配置，随 Docker 管理 |
 | docker-buildx-plugin | 多平台构建插件 | `docker buildx build` | builder 状态和缓存不入库 |
 | docker-compose-plugin | Compose 插件 | `docker compose up -d` | Compose 文件可入项目，`.env` 和数据卷不入库 |
+
+## Agentic 编码 CLI：`wsl/packages/agents.txt`
+
+Claude Code、Codex CLI 用各自官方原生安装器（`curl | sh`）装到 `~/.local/bin`，自带后台自更新。`bootstrap.sh --agents` 只做首次安装（二进制已存在则跳过），更新交给工具自己——和 winget 侧"自更新 app 不进批量升级"同理。Windows 上的 Claude / Codex 桌面 App 是 GUI 入口，与这里的 CLI 互补。
+
+| 工具 | 用途 | 安装/更新 | 恢复边界 |
+|---|---|---|---|
+| claude（Claude Code） | 终端 agentic 编码 | `curl -fsSL https://claude.ai/install.sh \| bash`；后台自更新 | 登录、权限、项目上下文手工恢复，不入库 |
+| codex（Codex CLI） | 终端 agentic 编码 | `curl -fsSL https://chatgpt.com/codex/install.sh \| sh`；自更新 | ChatGPT/API 登录状态不入库 |
+
+> 首次运行需登录（`claude` / `codex`），属手工边界。受限网络下先 `proxy_on` 再装。
 
 ## 脚本和校验工具
 

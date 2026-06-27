@@ -15,5 +15,9 @@ zoxide@latest
 starship@latest
 just@latest
 
+# GitHub CLI lives in WSL (next to your repos/git), not Windows. mise provides it
+# via the aqua:cli/cli backend.
+gh@latest
+
 # yq via mise is the Go (mikefarah) build; apt yq is the Python wrapper.
 yq@latest
