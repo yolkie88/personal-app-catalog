@@ -1,0 +1,9 @@
+# Kubernetes tools managed by mise. Every entry requires an explicit selector.
+kubectl@latest
+helm@latest
+k9s@latest
+kubectx@latest
+kubens@latest
+stern@latest
+oras@latest
+

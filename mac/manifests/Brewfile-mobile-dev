@@ -1,0 +1,3 @@
+# Heavy mobile/IDE tooling. SDK state, emulators, and IDE accounts stay manual.
+cask "android-studio"
+

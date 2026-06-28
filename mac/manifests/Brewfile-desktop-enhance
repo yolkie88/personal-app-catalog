@@ -1,0 +1,10 @@
+# Mac-native desktop enhancement tools.
+cask "rectangle"
+cask "alt-tab"
+cask "betterdisplay"
+cask "linearmouse"
+cask "mos"
+cask "only-switch"
+cask "pixpin"
+cask "popclip"
+

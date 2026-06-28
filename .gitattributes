@@ -3,3 +3,5 @@
 *.sh text eol=lf
 wsl/packages/*.txt text eol=lf
 wsl/config/** text eol=lf
+mac/packages/*.txt text eol=lf
+mac/config/** text eol=lf

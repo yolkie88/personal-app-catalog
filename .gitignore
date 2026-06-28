@@ -2,6 +2,9 @@
 windows/exports/
 windows/reports/
 windows/*.log
+mac/exports/
+mac/reports/
+mac/*.log
 values.yaml
 
 # Local environment and temporary files
@@ -31,6 +34,7 @@ values.yaml
 !**/config.example.yaml
 !**/config.example.yml
 !wsl/config/lazygit/config.yml
+!mac/config/lazygit/config.yml
 **/profiles.yaml
 **/providers/
 **/subscriptions*

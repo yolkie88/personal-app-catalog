@@ -1,0 +1,7 @@
+# Open-source container runtime path for macOS.
+brew "docker"
+brew "docker-compose"
+brew "docker-buildx"
+brew "lazydocker"
+
+cask "orbstack"

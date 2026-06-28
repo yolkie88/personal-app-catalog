@@ -1,0 +1,4 @@
+# Network and security debugging tools. Runtime rules and certificates stay manual.
+cask "lulu"
+cask "proxyman"
+

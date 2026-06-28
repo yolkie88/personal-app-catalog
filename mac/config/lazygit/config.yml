@@ -1,0 +1,19 @@
+# Managed by personal-app-catalog. Sanitized template only.
+# Base config with no external pager dependency.
+
+gui:
+  nerdFontsVersion: "3"
+  showFileTree: true
+  showRandomTip: false
+  scrollHeight: 4
+  sidePanelWidth: 0.3333
+git:
+  commit:
+    signOff: false
+  autoFetch: true
+update:
+  method: never
+keybinding:
+  universal:
+    quit: q
+

@@ -1,0 +1,4 @@
+# Explicit maintenance layer; not part of default/all.
+cask "pearcleaner"
+cask "latest"
+

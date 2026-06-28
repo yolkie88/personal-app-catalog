@@ -1,0 +1,41 @@
+# VS Code extensions installed by mac/configure.sh --vscode.
+# One extension ID per line; no private feeds or account-bound extensions.
+
+# Remote, containers, and Kubernetes
+ms-vscode-remote.remote-ssh
+ms-azuretools.vscode-containers
+ms-kubernetes-tools.vscode-kubernetes-tools
+
+# Python
+ms-python.python
+ms-python.vscode-pylance
+charliermarsh.ruff
+
+# JavaScript / TypeScript / Vue
+dbaeumer.vscode-eslint
+esbenp.prettier-vscode
+Vue.volar
+
+# Data / markup / config
+redhat.vscode-yaml
+tamasfe.even-better-toml
+yzhang.markdown-all-in-one
+davidanson.vscode-markdownlint
+editorconfig.editorconfig
+mechatroner.rainbow-csv
+
+# Git / GitHub / HTTP
+eamodio.gitlens
+mhutchie.git-graph
+github.vscode-github-actions
+humao.rest-client
+
+# Notebook
+ms-toolsai.jupyter
+
+# Workspace
+alefragnani.project-manager
+
+# Localization
+ms-ceintl.vscode-language-pack-zh-hans
+

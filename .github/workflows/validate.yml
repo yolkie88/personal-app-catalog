@@ -26,6 +26,9 @@ jobs:
       - name: Validate WSL files
         run: bash wsl/validate.sh
 
+      - name: Validate macOS files
+        run: bash mac/validate.sh
+
   shellcheck:
     runs-on: ubuntu-latest
     steps:
@@ -40,3 +43,11 @@ jobs:
           bash -n wsl/bootstrap.sh
           bash -n wsl/validate.sh
           shellcheck --severity=warning wsl/bootstrap.sh wsl/validate.sh
+
+      - name: Lint macOS shell scripts
+        run: |
+          bash -n mac/bootstrap.sh
+          bash -n mac/configure.sh
+          bash -n mac/validate.sh
+          bash -n mac/config/macos/defaults.sh
+          shellcheck --severity=warning mac/bootstrap.sh mac/configure.sh mac/validate.sh mac/config/macos/defaults.sh

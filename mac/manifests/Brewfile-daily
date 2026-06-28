@@ -1,0 +1,9 @@
+# Daily personal tools with mac-native defaults.
+cask "obsidian"
+cask "logseq"
+cask "markedit"
+cask "typora"
+cask "skim"
+cask "iina"
+cask "folo"
+cask "motrix"

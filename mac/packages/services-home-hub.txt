@@ -1,0 +1,7 @@
+# Services that may be enabled manually with brew services after installing home-hub.
+# Format: <name>|brew-service|user|<note> or <name>|brew-service|root|<note>
+syncthing|brew-service|user|peer file sync; UI and device IDs stay local
+caddy|brew-service|root|reverse proxy; Caddyfile and certificates stay local
+sing-box|brew-service|root|proxy core; config and subscription data stay local
+mosquitto|brew-service|user|optional MQTT broker for home automation
+

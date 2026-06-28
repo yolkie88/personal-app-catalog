@@ -6,8 +6,8 @@
 ## 开始之前先读什么
 
 1. `CLAUDE.md` —— 仓库是什么、manifest 是事实源、配置层规则、验证契约。
-2. 与任务相关的清单/脚本：`windows/manifests/`、`wsl/packages/`、`windows/bootstrap.ps1`、`wsl/bootstrap.sh`。
-3. 对应文档：`windows/docs/`、`wsl/docs/`。
+2. 与任务相关的清单/脚本：`windows/manifests/`、`wsl/packages/`、`mac/manifests/`、`windows/bootstrap.ps1`、`wsl/bootstrap.sh`、`mac/bootstrap.sh`。
+3. 对应文档：`windows/docs/`、`wsl/docs/`、`mac/docs/`。
 
 不要凭聊天里的偏好去改文档或清单结构；以仓库现有约定和 `validate` 为准。
 
@@ -19,13 +19,15 @@
 ```bash
 bash wsl/validate.sh
 shellcheck --severity=warning wsl/*.sh    # CI 也会跑
+bash mac/validate.sh
+shellcheck --severity=warning mac/*.sh mac/config/macos/defaults.sh
 ```
 
 经验：本地工作区“看起来通过”不等于干净检出通过。涉及新增文件时，用干净树复核，避免被 `.gitignore` 静默吞掉：
 
 ```bash
 tmp=$(mktemp -d); git archive --format=tar $(git write-tree) | tar -x -C "$tmp"
-(cd "$tmp" && bash wsl/validate.sh)
+(cd "$tmp" && bash wsl/validate.sh && bash mac/validate.sh)
 ```
 
 ## 常见任务模板
@@ -49,17 +51,25 @@ tmp=$(mktemp -d); git archive --format=tar $(git write-tree) | tar -x -C "$tmp"
 2. apt 基础包进 `apt-base.txt`；Docker 包进 `docker.txt`（五个必需包不能少）。
 3. 跑 `bash wsl/validate.sh`。
 
+### 新增 macOS 应用
+
+1. 优先选 Homebrew formula/cask；Mac App Store、官方安装器、GitHub Release 只在来源稳定且有恢复价值时记录。
+2. 加到对应 `mac/manifests/Brewfile-<profile>`，不要重复放到多个 profile。
+3. 若涉及新 profile：同步 `mac/bootstrap.sh` 的 `VALID_PROFILES`、`mac/docs/catalog.md` profile 表和 `all` 边界。
+4. 家庭枢纽服务只安装工具，不自动启用；真实 plist、配置、证书、订阅、设备 ID 和备份密钥写手工边界。
+5. 跑 `bash mac/validate.sh` 和 shellcheck。
+
 ### 审核 / 扩展配置层
 
-- 配置层模板在 `windows/config/`、`wsl/config/`，**不是** winget profile：不要进 `ValidateSet`、`all`、`catalog.md` profile 表。
-- 模板必须脱敏：无身份（`user.name`/`user.email`）、无 key/凭据/token、无个人历史。两个 validator 会扫描 `*/config/` 拦截 secret 赋值和 email。
+- 配置层模板在 `windows/config/`、`wsl/config/`、`mac/config/`，**不是** package profile：不要进 `ValidateSet`、`all`、`catalog.md` profile 表。
+- 模板必须脱敏：无身份（`user.name`/`user.email`）、无 key/凭据/token、无个人历史。validator 会扫描 `*/config/` 拦截 secret 赋值和 email。
 - 有外部依赖的配置要**按能力启用**（例：delta 的 Git/lazygit 配置只在检测到 delta 时引入），不要硬写死。
 - 应用脚本保持 plan-first、覆盖前备份、幂等。`configure.ps1 -Plan` 必须无副作用（不跑外部命令），CI 在 Linux pwsh 上跑它。
 - 新增 `config.yml`/`config.yaml` 命名的模板时注意 `.gitignore` 的 `**/config.yml` 规则会吞掉它，需要加 `!` 负向规则。
 
 ### 修 validation 失败
 
-validator 报错通常指明缺失的对应物：profile 缺 manifest、manifest 缺文档、`all` 不一致、清单缺 `@` 选择器、必需文件缺失、config 模板含 secret/email。按提示补齐对应文件，再重跑两个 validator。
+validator 报错通常指明缺失的对应物：profile 缺 manifest、manifest 缺文档、`all` 不一致、清单缺 `@` 选择器、必需文件缺失、config 模板含 secret/email。按提示补齐对应文件，再重跑相关 validator。
 
 ## AI 审核 checklist
 
@@ -69,7 +79,7 @@ validator 报错通常指明缺失的对应物：profile 缺 manifest、manifest
 - [ ] 配置层模板脱敏，无身份/凭据/token/email。
 - [ ] 有外部依赖的配置做了能力检测，而非硬依赖。
 - [ ] plan-first、备份、幂等都还成立；`-Plan`/`--plan` 无副作用。
-- [ ] 两个 validator + shellcheck 通过（干净树复核）。
+- [ ] Windows / WSL / macOS 相关 validator + shellcheck 通过（干净树复核）。
 - [ ] 未提交机器状态、导出、报告、运行期 config、密钥订阅。
 
 ## Claude / Codex 权限与边界建议

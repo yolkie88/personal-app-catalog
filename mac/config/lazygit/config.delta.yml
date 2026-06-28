@@ -1,0 +1,22 @@
+# Managed by personal-app-catalog. Sanitized template only.
+# Delta-enabled lazygit variant.
+
+gui:
+  nerdFontsVersion: "3"
+  showFileTree: true
+  showRandomTip: false
+  scrollHeight: 4
+  sidePanelWidth: 0.3333
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  commit:
+    signOff: false
+  autoFetch: true
+update:
+  method: never
+keybinding:
+  universal:
+    quit: q
+

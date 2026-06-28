@@ -1,0 +1,6 @@
+# Developer runtimes managed by mise. Every entry requires an explicit selector.
+node@lts
+python@latest
+uv@latest
+pnpm@latest
+

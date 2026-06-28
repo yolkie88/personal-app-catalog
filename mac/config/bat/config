@@ -1,0 +1,8 @@
+# Managed by personal-app-catalog. Sanitized template only.
+
+--theme="Monokai Extended"
+--style="numbers,changes,header"
+--italic-text=always
+--map-syntax="*.conf:INI"
+--map-syntax=".gitconfig.shared:Git Config"
+

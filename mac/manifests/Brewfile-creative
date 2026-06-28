@@ -1,0 +1,5 @@
+# Creative and modeling tools. Project assets remain manual.
+cask "shotcut"
+cask "blender"
+cask "freecad"
+

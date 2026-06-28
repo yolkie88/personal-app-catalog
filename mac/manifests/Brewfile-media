@@ -1,0 +1,8 @@
+# Media conversion and inspection.
+brew "ffmpeg"
+brew "yt-dlp"
+brew "imagemagick"
+brew "mkvtoolnix"
+
+cask "handbrake"
+

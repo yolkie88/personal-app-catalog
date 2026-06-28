@@ -1,0 +1,6 @@
+# Large local AI tools. Models, caches, and licenses are manual boundaries.
+cask "cherry-studio"
+cask "chatwise"
+cask "ollama"
+cask "lm-studio"
+cask "jan"

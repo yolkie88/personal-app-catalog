@@ -1,0 +1,7 @@
+# Account-backed communication apps. Login state is manual.
+cask "telegram"
+cask "wechat"
+cask "wechatwork"
+cask "zoom"
+cask "discord"
+cask "windows-app"

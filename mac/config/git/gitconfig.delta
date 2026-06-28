@@ -1,0 +1,14 @@
+# Managed by personal-app-catalog. Sanitized template only.
+# Included only when the delta command is installed.
+
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false
+

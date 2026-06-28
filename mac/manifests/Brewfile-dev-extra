@@ -1,0 +1,8 @@
+# GUI development tools that are useful on macOS but not part of the default layer.
+cask "zed"
+cask "beekeeper-studio"
+cask "bruno"
+cask "db-browser-for-sqlite"
+cask "drawio"
+cask "sourcegit"
+cask "tabby"

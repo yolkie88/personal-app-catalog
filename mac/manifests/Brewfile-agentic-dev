@@ -1,0 +1,18 @@
+# Agentic coding and development entry points for macOS.
+brew "mise"
+brew "gh"
+brew "just"
+brew "direnv"
+brew "zoxide"
+brew "starship"
+brew "git-delta"
+brew "lazygit"
+brew "neovim"
+brew "shellcheck"
+brew "shfmt"
+brew "yq"
+
+cask "visual-studio-code"
+cask "iterm2"
+cask "chatgpt"
+cask "claude"

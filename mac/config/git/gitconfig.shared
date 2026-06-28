@@ -1,0 +1,42 @@
+# Managed by personal-app-catalog. Sanitized template only.
+# Identity, signing keys, and credentials stay in the user's own ~/.gitconfig.
+
+[core]
+	autocrlf = input
+	ignorecase = false
+
+[merge]
+	conflictstyle = zdiff3
+
+[diff]
+	colorMoved = default
+	algorithm = histogram
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+
+[fetch]
+	prune = true
+
+[push]
+	autoSetupRemote = true
+
+[rebase]
+	autosquash = true
+
+[column]
+	ui = auto
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	ci = commit
+	lg = log --oneline --graph --decorate -20
+	last = log -1 HEAD --stat
+	unstage = reset HEAD --
+	amend = commit --amend --no-edit
+
