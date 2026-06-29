@@ -17,7 +17,6 @@ log-level: info
 # ---- 性能 / 行为优化（mihomo 官方推荐，见 wiki.metacubex.one）----
 unified-delay: true                  # 去掉首次握手 RTT 偏差，url-test 测速更公平
 tcp-concurrent: true                 # 对多 IP 域名并发握手，连接更快更稳
-global-client-fingerprint: chrome    # 未单独设指纹的节点兜底 uTLS 指纹（抗封锁）
 
 # Geo 数据库自动更新（服务常驻，定期刷新规则库）
 geo-auto-update: true
@@ -85,14 +84,14 @@ dns:
 
   # *** 指定某些域名走特定 DNS ***
   # key 是域名匹配（支持 +. 通配、geosite:、rule-set:），value 是该域名使用的 DNS。
-  # 命中 policy 的域名会跳过 fallback，直接用这里指定的解析器。
+  # 顺序敏感：更具体的内网/专用域名放在 geosite:cn 前面，避免被 cn 规则抢先命中。
   nameserver-policy:
-    "geosite:cn":
-      - https://223.5.5.5/dns-query        # 国内域名走阿里 DoH
     "+.company.internal":
       - 10.0.0.53                          # 内网域名走内网 DNS（按需改/删）
     "+.example.com":
       - 8.8.8.8                            # 指定单个域名走指定 DNS（示例）
+    "geosite:cn":
+      - https://223.5.5.5/dns-query        # 国内域名走阿里 DoH
 
 # ---- 节点来源 ----
 # 默认主力 = 自建节点（下面的 proxies 段）。订阅只作临时应急：默认关闭，

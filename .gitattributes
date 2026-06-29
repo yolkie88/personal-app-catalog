@@ -3,5 +3,11 @@
 *.sh text eol=lf
 wsl/packages/*.txt text eol=lf
 wsl/config/** text eol=lf
+windows/proxy/*.yaml text eol=lf
+mac/manifests/Brewfile-* text eol=lf
+mac/manifests/mas-*.txt text eol=lf
 mac/packages/*.txt text eol=lf
 mac/config/** text eol=lf
+mac/docs/*.md text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
