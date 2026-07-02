@@ -120,7 +120,7 @@ wsl --list --online
 wsl --shutdown                 # 重启生效
 ```
 
-再让 apt 走 Windows mihomo（mirrored 下 root 可达 `127.0.0.1:7890`；`sudo apt` 不继承 shell 代理变量，需单独配）：
+再让 apt 走 Windows sing-box（mirrored 下 root 可达 `127.0.0.1:7890`；`sudo apt` 不继承 shell 代理变量，需单独配）：
 
 ```bash
 sudo tee /etc/apt/apt.conf.d/99proxy >/dev/null <<'EOF'

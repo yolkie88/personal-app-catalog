@@ -417,6 +417,7 @@ function Test-RequiredFiles {
         "windows/config/vscode/extensions.txt",
         "windows/config/vscode/settings.json",
         "windows/config/wsl/wslconfig",
+        "windows/proxy/sing-box.example.json",
         "windows/proxy/config.example.yaml",
         "windows/docs/config.md",
         "docs/agent-workflows.md",

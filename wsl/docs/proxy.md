@@ -1,12 +1,12 @@
 # WSL 代理策略
 
-本项目采用 Windows mihomo 为代理入口，WSL 通过 mirrored networking、autoProxy 和显式环境变量使用代理。
+本项目采用 Windows sing-box 为默认代理入口，WSL 通过 mirrored networking、autoProxy 和显式环境变量使用代理。
 
 默认目标：新机恢复时代理常开，因为受限网络下没有代理 `apt`、Docker、mise、Git 和 agentic CLI 都可能无法安装或使用。代理地址本身可以模板化，节点、订阅、secret 和账号状态仍然不入库。TUN 仍不默认启用，作为最后兜底。
 
 ## Windows 侧前提
 
-mihomo 推荐监听本机：
+sing-box 默认监听本机：
 
 ```text
 127.0.0.1:7890
@@ -55,7 +55,7 @@ mirrored 模式下，WSL 通常可以直接访问 Windows 本机的 `127.0.0.1:7
 - `/etc/systemd/system/docker.service.d/proxy.conf`：Docker daemon 代理；
 - `~/.docker/config.json`：仅当文件不存在时写 Docker build/client 代理；若已有文件则跳过，避免覆盖 registry 登录凭据。
 
-默认入口是 Windows mihomo 的 `127.0.0.1:7890`。如端口不同：
+默认入口是 Windows sing-box 的 `127.0.0.1:7890`。如端口不同：
 
 ```bash
 ./wsl/bootstrap.sh --proxy --proxy-host 127.0.0.1 --proxy-port 7890
@@ -81,7 +81,7 @@ mirrored 模式下，WSL 通常可以直接访问 Windows 本机的 `127.0.0.1:7
 
 `.wslconfig` 里的 `autoProxy=true`、`bootstrap.sh --proxy` 和下面的 `proxy_on` 不是二选一，而是分工，理解这点能避免叠加和困惑：
 
-- **`autoProxy`（自动、被动）**：WSL 发行版启动时，会根据 **Windows 系统代理**自动注入 `HTTP_PROXY` / `HTTPS_PROXY` 等环境变量。所以当 mihomo 已开启系统代理时，新开的 WSL shell **通常已经有代理**，不需要再 `proxy_on`。它一般只给 http/https，不一定给 `all_proxy`（SOCKS）。
+- **`autoProxy`（自动、被动）**：WSL 发行版启动时，会根据 **Windows 系统代理**自动注入 `HTTP_PROXY` / `HTTPS_PROXY` 等环境变量。所以当 sing-box 已开启系统代理时，新开的 WSL shell **通常已经有代理**，不需要再 `proxy_on`。它一般只给 http/https，不一定给 `all_proxy`（SOCKS）。
 - **`bootstrap.sh --proxy`（持久、主动）**：本项目默认恢复路径。它不依赖 Windows 系统代理是否开启，直接写 WSL 内的 shell、apt、Git 和 Docker 代理配置。
 - **`proxy_on`（临时、主动）**：用于临时覆盖当前 shell 的代理 host/port，或在没有运行 `--proxy` 的临时环境里手动启用代理。
 

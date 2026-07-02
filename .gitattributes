@@ -4,6 +4,14 @@
 wsl/packages/*.txt text eol=lf
 wsl/config/** text eol=lf
 windows/proxy/*.yaml text eol=lf
+windows/proxy/*.json text eol=lf
+windows/manifests/*.json text eol=lf
+windows/*.ps1 text eol=lf
+windows/config/** text eol=lf
+windows/docs/*.md text eol=lf
+wsl/docs/*.md text eol=lf
+AGENTS.md text eol=lf
+README.md text eol=lf
 mac/manifests/Brewfile-* text eol=lf
 mac/manifests/mas-*.txt text eol=lf
 mac/packages/*.txt text eol=lf

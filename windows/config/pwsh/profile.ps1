@@ -32,7 +32,7 @@ if (Get-Command starship -ErrorAction SilentlyContinue) {
 }
 
 # --- Session-only proxy helpers ------------------------------------------------
-# These helpers assume mihomo listens on 127.0.0.1:7890. They only affect the
+# These helpers assume the local proxy core listens on 127.0.0.1:7890. They only affect the
 # current PowerShell process and child processes; they do not change Windows
 # system proxy, WinHTTP, registry, or persisted tool config.
 function proxy-on {

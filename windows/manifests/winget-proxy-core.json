@@ -5,7 +5,8 @@
     {
       "Packages": [
         { "PackageIdentifier": "MetaCubeX.Mihomo" },
-        { "PackageIdentifier": "CloudBees.WindowsServiceWrapper.3" }
+        { "PackageIdentifier": "CloudBees.WindowsServiceWrapper.3" },
+        { "PackageIdentifier": "SagerNet.sing-box" }
       ],
       "SourceDetails": {
         "Argument": "https://cdn.winget.microsoft.com/cache",

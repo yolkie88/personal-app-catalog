@@ -127,7 +127,7 @@ Docker daemon 代理属于本机运行期配置，由显式 `./wsl/bootstrap.sh 
 
 ## 代理策略
 
-Windows 侧优先使用 mihomo core + Web UI 的轻量方式，主要依赖系统代理；WSL 在 mirrored networking 下优先访问 `127.0.0.1:7890`，并通过 `./wsl/bootstrap.sh --proxy` 配置常开代理。`proxy_on` / `proxy_off` 只用于当前 shell 的临时覆盖。
+Windows 侧优先使用 sing-box 用户态系统代理；WSL 在 mirrored networking 下优先访问 `127.0.0.1:7890`，并通过 `./wsl/bootstrap.sh --proxy` 配置常开代理。`proxy_on` / `proxy_off` 只用于当前 shell 的临时覆盖。
 
 详细方案见：
 

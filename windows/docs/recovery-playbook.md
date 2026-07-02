@@ -83,7 +83,7 @@ wslinfo --networking-mode
 
 ### 5.3 配置 WSL 常开代理
 
-确保 Windows 侧 mihomo 已监听 `127.0.0.1:7890`。mirrored 下 WSL（含 root）可直接访问它。先预览，再写常开代理（详见 `wsl/docs/proxy.md`）：
+确保 Windows 侧 sing-box 已监听 `127.0.0.1:7890`。mirrored 下 WSL（含 root）可直接访问它。先预览，再写常开代理（详见 `wsl/docs/proxy.md`）：
 
 ```bash
 ./wsl/bootstrap.sh --proxy --plan

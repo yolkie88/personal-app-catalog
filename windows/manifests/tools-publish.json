@@ -12,6 +12,12 @@
       "sourceExe": "winsw.exe",
       "subdir": "mihomo",
       "targetExe": "mihomo-service.exe"
+    },
+    {
+      "wingetId": "SagerNet.sing-box",
+      "sourceExe": "sing-box-*-windows-amd64\\sing-box.exe",
+      "subdir": "sing-box",
+      "targetExe": "sing-box.exe"
     }
   ]
 }

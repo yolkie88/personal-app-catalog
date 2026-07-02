@@ -22,11 +22,12 @@ Git 身份（`user.name` / `user.email`）、SSH/GPG、各类账号登录、Powe
 
 ## 代理核心
 
-`proxy-core` 只安装 Mihomo 和 WinSW（mihomo 作为首选主核心，WinSW 用于服务化）。sing-box 不再默认安装，作为可选备用核心，需要时手工 `winget install SagerNet.sing-box`。真实配置按设备维护，倾向以系统服务运行，TUN 只按设备、按需开启。
+`proxy-core` 安装 sing-box、Mihomo 和 WinSW。sing-box 是默认用户态系统代理核心；mihomo 作为备用核心和服务化候选。winget 只负责下载/升级 portable 包，再由 `publish-tools.ps1` 落到 `C:\Tools\...`。真实配置按设备维护，TUN 只按设备、按需开启。
 
 建议边界：
 
-- 已提交脱敏模板 `windows/proxy/config.example.yaml`；复制为 `config.yaml` 后填入订阅、`secret` 等私有值。
+- 已提交脱敏模板 `windows/proxy/sing-box.example.json`；复制为本机 `config.json` 后填入节点私有值。
+- 已保留 mihomo 脱敏模板 `windows/proxy/config.example.yaml`；备用时复制为 `config.yaml` 后填入订阅、`secret` 等私有值。
 - 不提交订阅、节点、secret、缓存、真实日志。
 - 不让多个 TUN 核心同时常驻。
 - 服务化路径、账号和权限按设备处理。

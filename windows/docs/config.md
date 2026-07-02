@@ -41,7 +41,7 @@
 
 ## 代理
 
-Windows 代理策略见 `windows/docs/proxy.md`。本项目推荐 mihomo core + Web UI 的轻量方案：系统代理优先，WinHTTP 按需同步，少数不走系统代理的软件单独处理，TUN 仅兜底。
+Windows 代理策略见 `windows/docs/proxy.md`。本项目推荐 sing-box 用户态系统代理：系统代理优先，WinHTTP 按需同步，少数不走系统代理的软件单独处理，TUN 仅兜底。
 
 PowerShell profile 提供当前 session 的代理开关：
 
@@ -68,4 +68,4 @@ proxy-off
 - 配置层不是 winget profile，不进入 `bootstrap.ps1` 的 `ValidateSet`、`all` 集合或 `catalog.md` 的 profile 表。
 - JSON 模板（Windows Terminal、VS Code settings）里以 `_` 开头的 key 是模板元数据（如 `_comment`），`configure.ps1` 深合并前会剥掉，不会写进你的真实配置。
 - VS Code 配置层是可选的（`configure.ps1 -VSCode`）：只管理推荐扩展和脱敏 settings 默认值，深合并保留你已有的 key。**不管理**账号登录、Settings Sync 密钥、私有扩展源——这些仍走 VS Code 自带 Settings Sync 或手工恢复。
-- 代理模板只提供本机默认地址和临时开关；mihomo 订阅、节点、控制端 secret、日志和缓存不入库。
+- 代理模板只提供本机默认地址和临时开关；sing-box/mihomo 的节点、订阅、控制端 secret、日志和缓存不入库。
